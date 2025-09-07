@@ -9,7 +9,8 @@ import {
   MapPin,
 } from "lucide-react";
 import Header from "../components/layout/Header.jsx";
-import { SearchFilter, VaccineCard } from "../components/index.js";
+import { SearchFilter } from "../components/index.js";
+import VaccineCard from "../components/vaccine/VaccineCard.jsx";
 import Cart from "../components/cart/Cart.jsx";
 import { transformVaccineData } from "../utils/helpers.js";
 import vaccineService from "../services/vaccineService.js";
