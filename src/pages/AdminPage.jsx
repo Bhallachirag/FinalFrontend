@@ -47,12 +47,16 @@ export default function AdminPage() {
   }, []);
 
   const fetchUserData = async (userId) => {
+    console.log('Fetching user data for userId:', userId);
     if (userCache[userId]) {
+      console.log('Found user in cache:', userCache[userId]);
       return userCache[userId];
     }
 
     try {
+       console.log('Calling authService.fetchUserData with:', { userId, token });
       const userData = await authService.fetchUserData(userId, token);
+        console.log('Received user data:', userData);
       setUserCache((prev) => ({
         ...prev,
         [userId]: userData,
@@ -72,7 +76,7 @@ export default function AdminPage() {
     try {
       const bookingsArray = await bookingService.fetchAllBookings(token);
       const filteredBookings = bookingsArray.filter(
-        (booking) => booking.id % 2 !== 0
+        (booking) => booking.id 
       );
       const bookingsWithUsers = await Promise.all(
         filteredBookings.map(async (booking) => {

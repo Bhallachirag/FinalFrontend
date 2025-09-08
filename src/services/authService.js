@@ -27,7 +27,7 @@ class AuthService {
       } else {
         return { 
           success: false, 
-          message: data.message || 'Login failed' 
+          message: data.message || 'Wrong Password or Wrong Email' 
         };
       }
     } catch (error) {
@@ -73,7 +73,7 @@ class AuthService {
 
   async fetchUserData(userId, token) {
     try {
-      const response = await fetch(`${API_ENDPOINTS.USER_SERVICE}/api/v1/users/${userId}`, {
+      const response = await fetch(`${API_ENDPOINTS.AUTH_SERVICE}/api/v1/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
