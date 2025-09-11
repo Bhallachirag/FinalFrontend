@@ -23,18 +23,6 @@ const Header = ({ onCartClick, cartItems }) => {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#vaccines" className="text-gray-700 hover:text-black font-medium transition-colors">
-              Vaccines
-            </a>
-            <a href="#about" className="text-gray-700 hover:text-black font-medium transition-colors">
-              About
-            </a>
-            <a href="#contact" className="text-gray-700 hover:text-black font-medium transition-colors">
-              Contact
-            </a>
-          </nav>
-
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-1 text-sm text-gray-600">
               <MapPin className="w-4 h-4" />
@@ -90,31 +78,8 @@ const Header = ({ onCartClick, cartItems }) => {
                 Login
               </button>
             )}
-
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-600"
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
         </div>
-
-        {isMenuOpen && (
-          <div className="md:hidden border-t py-4">
-            <nav className="flex flex-col space-y-2">
-              <a href="#vaccines" className="text-black hover:text-black font-medium py-2">
-                Vaccines
-              </a>
-              <a href="#about" className="text-black hover:text-black font-medium py-2">
-                About
-              </a>
-              <a href="#contact" className="text-black hover:text-black font-medium py-2">
-                Contact
-              </a>
-            </nav>
-          </div>
-        )}
 
         <LoginModal 
           isOpen={showLoginModal} 

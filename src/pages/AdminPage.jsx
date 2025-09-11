@@ -47,16 +47,13 @@ export default function AdminPage() {
   }, []);
 
   const fetchUserData = async (userId) => {
-    console.log('Fetching user data for userId:', userId);
     if (userCache[userId]) {
       console.log('Found user in cache:', userCache[userId]);
       return userCache[userId];
     }
 
     try {
-       console.log('Calling authService.fetchUserData with:', { userId, token });
       const userData = await authService.fetchUserData(userId, token);
-        console.log('Received user data:', userData);
       setUserCache((prev) => ({
         ...prev,
         [userId]: userData,
@@ -93,7 +90,6 @@ export default function AdminPage() {
       );
 
       setBookings(bookingsWithUsers);
-      console.log("Fetched bookings with user data:", bookingsWithUsers);
     } catch (err) {
       setBookingsError(err.message);
       console.error("Error fetching bookings:", err);
