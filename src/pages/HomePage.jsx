@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, Search, Syringe, Clock, Phone, Mail, MapPin} from "lucide-react";
+import { Check, Search, Syringe, Clock, Phone, Mail, MapPin, X} from "lucide-react";
 import Header from "../components/layout/Header.jsx";
 import { SearchFilter } from "../components/index.js";
 import VaccineCard from "../components/vaccine/VaccineCard.jsx";
@@ -15,6 +15,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false);
 
   useEffect(() => {
     const fetchVaccines = async () => {
@@ -62,6 +63,38 @@ const HomePage = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  const LearnMoreModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div className="text-center space-y-4">
+            <h3 className="text-2xl font-bold text-gray-900">Hi there! 👋</h3>
+            <div className="space-y-4 text-gray-600">
+              <p>
+                We are Bhalla Distributors, proudly based in Prayagraj, Uttar Pradesh.
+              </p>
+              <p>
+                This platform represents our humble effort to make a positive impact
+                in healthcare accessibility and ultimately save lives.
+              </p>
+              <p className="text-lg font-semibold text-blue-600">
+                We Care and We Serve!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -250,7 +283,10 @@ const HomePage = () => {
               <button className="bg-neutral-200 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-colors">
                 Browse Vaccines
               </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-black transition-colors">
+              <button 
+                onClick={() => setIsLearnMoreOpen(true)}
+                className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-black transition-colors"
+                >
                 Learn More
               </button>
             </div>
@@ -447,6 +483,11 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
+
+      <LearnMoreModal 
+        isOpen={isLearnMoreOpen} 
+        onClose={() => setIsLearnMoreOpen(false)} 
+      />
 
       {/* Cart Modal */}
       <Cart
