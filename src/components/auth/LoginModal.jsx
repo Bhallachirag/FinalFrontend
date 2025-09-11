@@ -160,7 +160,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-gradient-to-r bg-white text-black py-3 rounded-lg font-semibold hover:from-stone-900 hover:to-stone-900 hover:text-white transition-all duration-200 disabled:opacity-50"
+            className="w-full bg-gradient-to-r bg-neutral-100 text-black py-3 rounded-lg font-semibold hover:from-stone-900 hover:to-stone-900 hover:text-white transition-all duration-200 disabled:opacity-50"
           >
             {loading ? "Processing..." : isLogin ? "Login" : "Sign Up"}
           </button>
