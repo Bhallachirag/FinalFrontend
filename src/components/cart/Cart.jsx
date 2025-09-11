@@ -69,7 +69,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col">
           <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
             <h2 className="text-2xl font-bold text-gray-900">Your Cart</h2>
