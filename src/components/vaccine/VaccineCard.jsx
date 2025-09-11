@@ -37,7 +37,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
           />
         ) : (
           <div className="w-24 h-24 bg-gradient-to-br rounded-2xl flex items-center justify-center">
-            <Syringe className="w-12 h-12 text-white" />
+            <Syringe className="w-12 h-12 text-black" />
           </div>
         )}
       </div>
