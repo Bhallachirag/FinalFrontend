@@ -86,7 +86,7 @@ const HomePage = () => {
     }
 
     const filtered = vaccines.filter((vaccine) =>
-      vaccine.name.toLowerCase().includes(searchTerm.toLowerCase())
+      vaccine.name.toLowerCase().startsWith(searchTerm.toLowerCase())
     );
     setFilteredVaccines(filtered);
   };
