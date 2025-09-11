@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, ChevronDown, MapPin, Phone, Shield } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, MapPin, Phone, Syringe } from "lucide-react";
 import { AuthContext } from '../../stores/authStore.js';
 import LoginModal from '../auth/LoginModal.jsx';
 
@@ -16,8 +16,8 @@ const Header = ({ onCartClick, cartItems }) => {
       <div className="flex justify-between items-center h-16">
         {/* Left side - Logo */}
         <div className="flex-shrink-0 flex items-center space-x-0">
-          <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-lg flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-r bg-blue-500 rounded-lg flex items-center justify-center">
+            <Syringe className="w-5 h-5 text-white" />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r text-blue-600">
             BhallaDistributors

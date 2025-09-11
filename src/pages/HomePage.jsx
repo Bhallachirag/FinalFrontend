@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, Search, Shield, Clock, Phone, Mail, MapPin} from "lucide-react";
+import { Check, Search, Syringe, Clock, Phone, Mail, MapPin} from "lucide-react";
 import Header from "../components/layout/Header.jsx";
 import { SearchFilter } from "../components/index.js";
 import VaccineCard from "../components/vaccine/VaccineCard.jsx";
@@ -343,7 +343,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-8 h-8 text-white" />
+                <Syringe className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 100% Authentic
