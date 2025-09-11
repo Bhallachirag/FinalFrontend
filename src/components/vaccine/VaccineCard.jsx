@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, Shield } from "lucide-react";
+import { Heart, Syringe } from "lucide-react";
 
 const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -37,7 +37,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
           />
         ) : (
           <div className="w-24 h-24 bg-gradient-to-br bg-green-400 rounded-2xl flex items-center justify-center">
-            <Shield className="w-12 h-12 text-white" />
+            <Syringe className="w-12 h-12 text-white" />
           </div>
         )}
       </div>
