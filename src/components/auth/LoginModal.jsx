@@ -84,7 +84,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 z-60 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border-2 max-w-md w-full overflow-hidden">
-       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r bg-green-400 text-black">
+       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r bg-blue-500 text-black">
         <div></div> {/* Empty spacer */}
         <h2 className="text-2xl font-bold">
         {isLogin ? "Login" : "Sign Up"}

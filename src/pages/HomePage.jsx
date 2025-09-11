@@ -68,10 +68,8 @@ const HomePage = () => {
     if (!isOpen) return null;
 
     return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"></div>
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-2xl p-6 max-w-md w-full">
+      <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -95,9 +93,8 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
