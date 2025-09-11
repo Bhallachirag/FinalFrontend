@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Check,
-  Search,
-  Shield,
-  Clock,
-  Phone,
-  Mail,
-  MapPin,
-} from "lucide-react";
+import { Check, Search, Shield, Clock, Phone, Mail, MapPin} from "lucide-react";
 import Header from "../components/layout/Header.jsx";
 import { SearchFilter } from "../components/index.js";
 import VaccineCard from "../components/vaccine/VaccineCard.jsx";
@@ -245,8 +237,8 @@ const HomePage = () => {
       <Header onCartClick={() => setIsCartOpen(true)} cartItems={cartItems} />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-black via-black to-black text-neutral-200 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-br from-black via-black to-black text-neutral-200 py-20 width-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Your Health, Our Priority
