@@ -36,7 +36,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-24 h-24 bg-gradient-to-br bg-green-400 rounded-2xl flex items-center justify-center">
+          <div className="w-24 h-24 bg-gradient-to-br rounded-2xl flex items-center justify-center">
             <Syringe className="w-12 h-12 text-white" />
           </div>
         )}
