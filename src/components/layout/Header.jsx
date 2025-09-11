@@ -15,7 +15,7 @@ const Header = ({ onCartClick, cartItems }) => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center h-16">
         {/* Left side - Logo */}
-        <div className="flex-shrink-0 flex items-center space-x-0">
+        <div className="flex-shrink-0 flex items-center space-x-3">
           <div className="w-8 h-8 bg-gradient-to-r bg-blue-500 rounded-lg flex items-center justify-center">
             <Syringe className="w-5 h-5 text-white" />
           </div>
