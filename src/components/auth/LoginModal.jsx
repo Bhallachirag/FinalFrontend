@@ -84,7 +84,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 z-60 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border-2 max-w-md w-full overflow-hidden">
-       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r bg-white text-black">
+       <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r bg-rose-50 text-black">
         <div></div> {/* Empty spacer */}
         <h2 className="text-2xl font-bold">
         {isLogin ? "Login" : "Sign Up"}
@@ -153,6 +153,8 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
               />
             </div>
           )}
+
+          <div className="border-b border-gray-200 mb-4"></div>
 
           <button
             type="button"
