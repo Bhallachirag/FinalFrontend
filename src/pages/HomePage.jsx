@@ -385,7 +385,7 @@ const HomePage = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-r bg-blue-500 rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
+                  <Syringe className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-2xl font-bold">BhallaDistributors</span>
               </div>
