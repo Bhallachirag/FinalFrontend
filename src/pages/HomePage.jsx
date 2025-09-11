@@ -237,7 +237,7 @@ const HomePage = () => {
       <Header onCartClick={() => setIsCartOpen(true)} cartItems={cartItems} />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-black via-black to-black text-neutral-200 py-20 width-full">
+      <section className="bg-gradient-to-br fr bg-blue-500 text-white py-20 width-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
@@ -259,25 +259,25 @@ const HomePage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-neutral-100">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-stone-950 mb-2">5K+</div>
+              <div className="text-4xl font-bold text- mb-2 text-blue-500">5K+</div>
               <div className="text-gray-600">Vaccines Delivered</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-stone-950 mb-2">
+              <div className="text-4xl font-bold text-blue-500 mb-2">
                 1000+
               </div>
               <div className="text-gray-600">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-stone-950 mb-2">24/7</div>
+              <div className="text-4xl font-bold text-blue-500 mb-2">24/7</div>
               <div className="text-gray-600">Customer Support</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-stone-950 mb-2">100%</div>
+              <div className="text-4xl font-bold text-blue-500 mb-2">100%</div>
               <div className="text-gray-600">Authentic Products</div>
             </div>
           </div>
@@ -288,7 +288,7 @@ const HomePage = () => {
       <section id="vaccines" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-black mb-4">
               Available Vaccines & Injections
             </h2>
             <p className="text-xl text-gray-600">
@@ -341,8 +341,8 @@ const HomePage = () => {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-stone-100 to-stone-200">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50">
+              <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -352,8 +352,8 @@ const HomePage = () => {
                 All vaccines are sourced directly from authorized manufacturers
               </p>
             </div>
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-stone-100 to-stone-200">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-pink-50 to-pink-50">
+              <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Clock className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -363,8 +363,8 @@ const HomePage = () => {
                 Quick and reliable delivery to your doorstep
               </p>
             </div>
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-stone-100 to-stone-200">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-green-50 to-green-50">
+              <div className="w-16 h-16 bg-green-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Phone className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -379,13 +379,13 @@ const HomePage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-8">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-white to-white rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-black" />
+                <div className="w-8 h-8 bg-gradient-to-r bg-blue-500 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-2xl font-bold">BhallaDistributors</span>
               </div>
@@ -393,14 +393,6 @@ const HomePage = () => {
                 Your trusted partner for vaccine distribution and healthcare
                 solutions.
               </p>
-              <div className="flex items-center space-x-2 text-gray-400">
-                <Phone className="w-4 h-4" />
-                <span>+91 91403 58238</span>
-              </div>
-              <div className="flex items-center space-x-2 text-gray-400">
-                <Mail className="w-4 h-4"  />
-                <span>chiragbhalla73@gmail.com</span>
-              </div>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
@@ -413,16 +405,6 @@ const HomePage = () => {
                 <li>
                   <a href="#" className="hover:text-white transition-colors">
                     Vaccines
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Booking
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Contact
                   </a>
                 </li>
               </ul>
@@ -438,16 +420,6 @@ const HomePage = () => {
                 <li>
                   <a href="#" className="hover:text-white transition-colors">
                     Home Delivery
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Reminders
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Support
                   </a>
                 </li>
               </ul>

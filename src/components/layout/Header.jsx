@@ -11,15 +11,15 @@ const Header = ({ onCartClick, cartItems }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
-  <header className="bg-neutral-200 shadow-lg sticky top-0 z-50 w-full">
+  <header className="bg-white shadow-lg sticky top-0 z-50 w-full">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center h-16">
         {/* Left side - Logo */}
         <div className="flex-shrink-0 flex items-center space-x-0">
-          <div className="w-8 h-8 bg-gradient-to-r from-black to-black rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-lg flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r text-stone-950">
+          <span className="text-2xl font-bold bg-gradient-to-r text-blue-600">
             BhallaDistributors
           </span>
         </div>
@@ -75,7 +75,7 @@ const Header = ({ onCartClick, cartItems }) => {
           ) : (
             <button
               onClick={() => setShowLoginModal(true)}
-              className="flex-shrink-0 whitespace-nowrap bg-black text-white px-1 sm:px-2 py-2 rounded-lg hover:bg-neutral-200 hover:text-black transition-colors font-medium"
+              className="flex-shrink-0 whitespace-nowrap bg-blue-500 text-white px-1 sm:px-2 py-2 rounded-lg hover:bg-neutral-200 hover:text-black transition-colors font-medium"
             >
               Login
             </button>

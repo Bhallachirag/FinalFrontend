@@ -103,7 +103,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
         <button
           onClick={() => onAddToCart(vaccine, inventory)}
           disabled={inventory.quantity === 0}
-          className="w-full bg-gradient-to-r from-black to-black text-white py-3 rounded-xl font-semibold hover:from-stone-800 hover:to-stone-800 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full bg-gradient-to-r bg-blue-500 text-white py-3 rounded-xl font-semibold hover:from-stone-800 hover:to-stone-800 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Add to Cart
         </button>
