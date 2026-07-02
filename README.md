@@ -1,12 +1,65 @@
-# React + Vite
+# VaxFlow — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React frontend for **VaxFlow**, a vaccine booking and inventory platform. Talks to the backend exclusively through the API Gateway, so the client never needs to know which microservice actually handles a request.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Vaccine search & browsing** — search and filter available vaccines with live inventory data pulled from the backend.
+- **Cart-based booking** — add multiple vaccines to a cart and check out in one flow, backed by the Booking Service's FIFO batch pricing.
+- **Auth flow** — login/signup modal wired to the Auth Service, with the session persisted client-side.
+- **Order history** — a "My Orders" page showing a user's past bookings.
+- **Admin page** — a separate view for managing vaccines and inventory.
+- **Global notifications** — a lightweight in-app notification system for success/error feedback across the app.
 
-## Expanding the ESLint configuration
+## Architecture
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+State is split by domain into small Zustand stores instead of one global store, and each backend resource has its own service module that wraps the actual API calls:
+
+```
+src/
+├── stores/            # authStore, cartStore, vaccineStore, notificationStore (Zustand)
+├── services/            # authService, vaccineService, bookingService — API call wrappers
+├── components/
+│   ├── auth/              # AuthProvider, LoginModal
+│   ├── cart/              # Cart
+│   ├── vaccine/           # VaccineCard, SearchFilter
+│   ├── layout/            # Header
+│   └── common/            # LoadingSpinner, Notification
+├── pages/               # HomePage, MyOrders, AdminPage
+├── hooks/                # useApi, useLocalStorage
+└── utils/                # api client, constants, validators, helpers
+```
+
+## Tech Stack
+
+React 19 · React Router 7 · Zustand · Tailwind CSS 4 · Vite · Lucide Icons
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+npm run preview
+```
+
+### Environment
+
+Point the frontend at your locally running API Gateway (default `http://localhost:4005`) via the API client config in `src/utils/api.js`.
+
+## Part of the VaxFlow microservices
+
+- **Frontend** (this repo)
+- [API Gateway](https://github.com/Bhallachirag/API_Gateway)
+- [Auth Service](https://github.com/Bhallachirag/Auth_Service)
+- [Vaccine & Search Service](https://github.com/Bhallachirag/VaccineAndSearchService)
+- [Booking Service](https://github.com/Bhallachirag/VaccineBookingService)
+- [Reminder Service](https://github.com/Bhallachirag/ReminderService)
+
+#### Author
+-Chirag Bhalla
