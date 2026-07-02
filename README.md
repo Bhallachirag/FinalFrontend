@@ -62,4 +62,5 @@ Point the frontend at your locally running API Gateway (default `http://localhos
 - [Reminder Service](https://github.com/Bhallachirag/ReminderService)
 
 #### Author
--Chirag Bhalla
+
+- **Chirag Bhalla**
