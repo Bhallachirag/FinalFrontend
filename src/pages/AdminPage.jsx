@@ -1,962 +1,655 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Users, Package, Calendar, Eye, AlertTriangle, Edit2, Trash2, Plus, X} from "lucide-react";
+import {
+  Users, Package, Calendar, Eye, AlertTriangle, Edit2, Trash2, Plus, X,
+  Syringe, LayoutDashboard, CheckCircle, Clock, TrendingUp, Search,
+  ChevronRight, Save, RefreshCw, LogOut, Shield, User, Bell, Activity,
+  Globe, Filter, MapPin, FileText, CheckCircle2, ArrowRight, Sparkles
+} from "lucide-react";
 import { AuthContext } from "../stores/authStore.js";
 import { DEFAULT_STATS, ADMIN_EMAIL } from "../utils/constants.js";
-import { getVaccinePrice, getVaccineQuantity, getInventoryDetails, extractUserName, extractVaccineName, extractDateTimeFromCreatedAt,
-     groupBookingsByDate } from "../utils/helpers.js";
+import {
+  getVaccinePrice, getVaccineQuantity, getInventoryDetails,
+  extractUserName, extractVaccineName, extractDateTimeFromCreatedAt, groupBookingsByDate
+} from "../utils/helpers.js";
 import vaccineService from "../services/vaccineService.js";
 import bookingService from "../services/bookingService.js";
 import authService from "../services/authService.js";
 
-export default function AdminPage() {
-  const {
-    user,
-    token,
-    loading: authLoading,
-  } = useContext(AuthContext) || {
-    user: { email: ADMIN_EMAIL },
-    token: "mock-token",
-    loading: false,
-  };
+// Reusable Toast
+const Toast = ({ toast, onClose }) => {
+  if (!toast) return null;
+  return (
+    <div className={`fixed top-6 right-6 z-[100] flex items-center space-x-3 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-xs font-bold transition-all ${toast.type === "error" ? "bg-red-600" : "bg-emerald-600"}`}>
+      <span>{toast.message}</span>
+      <button onClick={onClose}><X className="w-4 h-4" /></button>
+    </div>
+  );
+};
 
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalBookings: 0,
-    pendingBookings: 0,
-    totalVaccines: 0,
-  });
+// Confirm Dialog
+const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-gray-100">
+        <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-4 mx-auto">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-extrabold text-slate-900 text-center mb-2">{title}</h3>
+        <p className="text-xs text-slate-500 text-center mb-6">{message}</p>
+        <div className="flex space-x-3">
+          <button onClick={onCancel} className="flex-1 py-3 border border-gray-200 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-50 transition-colors">
+            Cancel
+          </button>
+          <button onClick={onConfirm} className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs transition-colors">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Edit Vaccine Modal
+const EditVaccineModal = ({ vaccine, isOpen, onClose, onSave, loading }) => {
+  const [form, setForm] = useState({ name: "", price: "", quantity: "" });
+
+  useEffect(() => {
+    if (vaccine) {
+      const inv = getInventoryDetails(vaccine);
+      setForm({ name: vaccine.name || "", price: inv?.price || "", quantity: inv?.quantity || "" });
+    }
+  }, [vaccine]);
+
+  if (!isOpen || !vaccine) return null;
+  const inventory = getInventoryDetails(vaccine);
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
+        <div className="h-1.5 bg-emerald-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-base font-extrabold text-slate-900">Edit Vaccine Details</h3>
+            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl"><X className="w-5 h-5" /></button>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div>
+              <label className="block font-bold text-slate-700 mb-1.5">Vaccine Name</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-xs bg-slate-50 focus:bg-white"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">Price (₹)</label>
+                <input
+                  type="number"
+                  value={form.price}
+                  onChange={e => setForm({ ...form, price: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-xs bg-slate-50 focus:bg-white"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">Quantity</label>
+                <input
+                  type="number"
+                  value={form.quantity}
+                  onChange={e => setForm({ ...form, quantity: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-xs bg-slate-50 focus:bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex space-x-3 mt-6">
+            <button onClick={onClose} className="flex-1 py-3 border border-gray-200 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-50">Cancel</button>
+            <button onClick={() => onSave(vaccine, form, inventory)} disabled={loading} className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-2">
+              {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>Save Changes</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Add Vaccine Modal
+const AddVaccineModal = ({ isOpen, onClose, onAdd, loading }) => {
+  const [form, setForm] = useState({ name: "", ageGroup: "All ages", description: "", quantity: "100", price: "500", batchNumber: "BT202501", expiryDate: "2026-12-31", manufacturedDate: "2025-01-01", manufacturer: "Pfizer / Serum Institute" });
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
+        <div className="h-1.5 bg-emerald-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <Plus className="w-5 h-5 text-emerald-600" />
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900">Add New Vaccine to Inventory</h3>
+            </div>
+            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl"><X className="w-5 h-5" /></button>
+          </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); onAdd(form); }} className="space-y-4 text-xs">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Vaccine Name *</label>
+                <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" placeholder="e.g. Covaxin" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Age Group *</label>
+                <select value={form.ageGroup} onChange={e => setForm({...form, ageGroup: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white">
+                  {["0-2 years","2-5 years","5-12 years","12-18 years","18+ years","All ages"].map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Price (₹) *</label>
+                <input required type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Quantity *</label>
+                <input required type="number" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Batch Number *</label>
+                <input required type="text" value={form.batchNumber} onChange={e => setForm({...form, batchNumber: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Manufacturer *</label>
+                <input required type="text" value={form.manufacturer} onChange={e => setForm({...form, manufacturer: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Manufactured Date *</label>
+                <input required type="date" value={form.manufacturedDate} onChange={e => setForm({...form, manufacturedDate: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Expiry Date *</label>
+                <input required type="date" value={form.expiryDate} onChange={e => setForm({...form, expiryDate: e.target.value})} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white" />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 pt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-3 border border-gray-200 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-50">Cancel</button>
+              <button type="submit" disabled={loading} className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-2">
+                {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Plus className="w-4 h-4" />}
+                <span>Add Vaccine</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function AdminPage() {
+  const { user, token, logout, loading: authLoading } = useContext(AuthContext) || { user: { email: ADMIN_EMAIL }, token: "mock-token", loading: false };
+
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [stats, setStats] = useState({ totalUsers: 0, totalBookings: 0, pendingBookings: 0, totalVaccines: 0 });
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
-  const [bookingsError, setBookingsError] = useState(null);
   const [vaccines, setVaccines] = useState([]);
   const [vaccinesLoading, setVaccinesLoading] = useState(false);
-  const [vaccinesError, setVaccinesError] = useState(null);
   const [userCache, setUserCache] = useState({});
-  const [showAddVaccineModal, setShowAddVaccineModal] = useState(false);
-  const [addVaccineLoading, setAddVaccineLoading] = useState(false);
+  const [bookingSearch, setBookingSearch] = useState("");
+  const [vaccineSearch, setVaccineSearch] = useState("");
 
-  // Load stats
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [editModal, setEditModal] = useState({ open: false, vaccine: null });
+  const [editLoading, setEditLoading] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, title: "", message: "", onConfirm: null });
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => { setToast({ message, type }); setTimeout(() => setToast(null), 3500); };
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStats(DEFAULT_STATS);
-      setLoading(false);
-    }, 1000);
-
+    const timer = setTimeout(() => { setStats(DEFAULT_STATS); setLoading(false); }, 800);
     return () => clearTimeout(timer);
   }, []);
 
-  const fetchUserData = async (userId) => {
-    if (userCache[userId]) {
-      console.log('Found user in cache:', userCache[userId]);
-      return userCache[userId];
-    }
+  useEffect(() => {
+    if (activeTab === "vaccines" && vaccines.length === 0) fetchVaccines();
+    if (activeTab === "bookings" && bookings.length === 0) fetchBookings();
+  }, [activeTab]);
 
+  const fetchUserData = async (userId) => {
+    if (userCache[userId]) return userCache[userId];
     try {
       const userData = await authService.fetchUserData(userId, token);
-      setUserCache((prev) => ({
-        ...prev,
-        [userId]: userData,
-      }));
-
+      setUserCache(prev => ({ ...prev, [userId]: userData }));
       return userData;
-    } catch (error) {
-      console.error(`Error fetching user ${userId}:`, error);
-      return null;
-    }
+    } catch { return null; }
   };
 
   const fetchBookings = async () => {
     setBookingsLoading(true);
-    setBookingsError(null);
-
     try {
       const bookingsArray = await bookingService.fetchAllBookings(token);
-      const filteredBookings = bookingsArray.filter(
-        (booking) => booking.id 
-      );
-      const bookingsWithUsers = await Promise.all(
-        filteredBookings.map(async (booking) => {
-          const userId = booking.userId || booking.userid;
-          if (userId) {
-            const userData = await fetchUserData(userId);
-            return {
-              ...booking,
-              userData: userData,
-            };
-          }
-          return booking;
+      const filtered = bookingsArray.filter(b => b.id);
+      const withUsers = await Promise.all(
+        filtered.map(async (b) => {
+          const userId = b.userId || b.userid;
+          if (userId) return { ...b, userData: await fetchUserData(userId) };
+          return b;
         })
       );
-
-      setBookings(bookingsWithUsers);
-    } catch (err) {
-      setBookingsError(err.message);
-      console.error("Error fetching bookings:", err);
-    } finally {
-      setBookingsLoading(false);
-    }
+      setBookings(withUsers);
+      setStats(prev => ({ ...prev, totalBookings: withUsers.length }));
+      showToast(`Loaded ${withUsers.length} bookings`);
+    } catch (err) { showToast(err.message, "error"); } finally { setBookingsLoading(false); }
   };
 
   const fetchVaccines = async () => {
     setVaccinesLoading(true);
-    setVaccinesError(null);
-
     try {
       const data = await vaccineService.fetchVaccines();
-      const vaccinesArray = data.data || [];
-
-      setVaccines(vaccinesArray);
-      console.log("Fetched vaccines:", vaccinesArray);
-    } catch (err) {
-      setVaccinesError(err.message);
-      console.error("Error fetching vaccines:", err);
-    } finally {
-      setVaccinesLoading(false);
-    }
+      const array = data.data || [];
+      setVaccines(array);
+      setStats(prev => ({ ...prev, totalVaccines: array.length }));
+      showToast(`Loaded ${array.length} vaccines`);
+    } catch (err) { showToast(err.message, "error"); } finally { setVaccinesLoading(false); }
   };
 
-  const addVaccine = async (vaccineData) => {
-    setAddVaccineLoading(true);
-
+  const handleAddVaccine = async (data) => {
+    setAddLoading(true);
     try {
-      const vaccineWithInventory = await vaccineService.addVaccine(
-        vaccineData,
-        token
-      );
-
-      setVaccines((prev) => [...prev, vaccineWithInventory]);
-      setShowAddVaccineModal(false);
-
-      setStats((prev) => ({
-        ...prev,
-        totalVaccines: prev.totalVaccines + 1,
-      }));
-
-      console.log("Vaccine and inventory created successfully");
-    } catch (err) {
-      alert(`Error adding vaccine: ${err.message}`);
-      console.error("Error adding vaccine:", err);
-    } finally {
-      setAddVaccineLoading(false);
-    }
+      const added = await vaccineService.addVaccine(data, token);
+      setVaccines(prev => [...prev, added]);
+      setShowAddModal(false);
+      setStats(prev => ({ ...prev, totalVaccines: prev.totalVaccines + 1 }));
+      showToast("Vaccine added successfully! ✓");
+    } catch (err) { showToast(err.message, "error"); } finally { setAddLoading(false); }
   };
 
-  const deleteVaccine = async (vaccineId) => {
-    if (!confirm("Are you sure you want to delete this vaccine?")) return;
-
+  const handleEditSave = async (vaccine, form, inventory) => {
+    setEditLoading(true);
     try {
-      await vaccineService.deleteVaccine(vaccineId, token);
-      setVaccines((prev) => prev.filter((vaccine) => vaccine.id !== vaccineId));
-      console.log("Vaccine deleted successfully");
-    } catch (err) {
-      alert(`Error deleting vaccine: ${err.message}`);
-      console.error("Error deleting vaccine:", err);
-    }
-  };
-
-  const updateVaccine = async (vaccineId, updatedData) => {
-    try {
-      await vaccineService.updateVaccine(vaccineId, updatedData, token);
-      
-      setVaccines((prev) =>
-        prev.map((vaccine) => {
-          if (vaccine.id === vaccineId) {
-            const updatedVaccine = { ...vaccine, ...updatedData };
-
-            // If price was updated and we have inventory, update the first inventory's price
-            if (
-              updatedData.price &&
-              vaccine.Inventories &&
-              vaccine.Inventories.length > 0
-            ) {
-              updatedVaccine.Inventories = vaccine.Inventories.map(
-                (inv, index) =>
-                  index === 0 ? { ...inv, price: updatedData.price } : inv
-              );
-            }
-
-            return updatedVaccine;
-          }
-          return vaccine;
-        })
-      );
-
-      console.log("Vaccine updated successfully");
-    } catch (err) {
-      alert(`Error updating vaccine: ${err.message}`);
-      console.error("Error updating vaccine:", err);
-    }
-  };
-
-  // Updated function to handle inventory updates separately
-  const updateInventory = async (inventoryId, updatedData) => {
-    try {
-      await vaccineService.updateInventory(inventoryId, updatedData, token);
-
-      // Update the specific inventory in state
-      setVaccines((prev) =>
-        prev.map((vaccine) => {
-          if (vaccine.Inventories) {
-            return {
-              ...vaccine,
-              Inventories: vaccine.Inventories.map((inv) =>
-                inv.id === inventoryId ? { ...inv, ...updatedData } : inv
-              ),
-            };
-          }
-          return vaccine;
-        })
-      );
-
-      console.log("Inventory updated successfully");
-    } catch (err) {
-      alert(`Error updating inventory: ${err.message}`);
-      console.error("Error updating inventory:", err);
-    }
-  };
-
-  const handleQuickUpdate = (vaccine) => {
-    const currentName = vaccine.name || "";
-    const currentPrice = getVaccinePrice(vaccine);
-    const inventory = getInventoryDetails(vaccine);
-
-    const newName = prompt("Enter new vaccine name:", currentName);
-    const newPrice = prompt("Enter new price:", currentPrice);
-    const newQuantity = inventory
-      ? prompt("Enter new quantity:", inventory.quantity)
-      : null;
-
-    if (newName !== null || newPrice !== null || newQuantity !== null) {
-      // Update vaccine name if changed
-      if (newName !== null && newName !== currentName) {
-        updateVaccine(vaccine.id, { name: newName });
+      if (form.name !== vaccine.name) await vaccineService.updateVaccine(vaccine.id, { name: form.name }, token);
+      if (inventory && (parseFloat(form.price) !== inventory.price || parseInt(form.quantity) !== inventory.quantity)) {
+        await vaccineService.updateInventory(inventory.id, { ...inventory, price: parseFloat(form.price), quantity: parseInt(form.quantity) }, token);
       }
-
-      // Update inventory price and quantity if changed and inventory exists
-      if (inventory && (newPrice !== null || newQuantity !== null)) {
-        const inventoryUpdates = {};
-
-        if (newPrice !== null && parseFloat(newPrice) !== currentPrice) {
-          inventoryUpdates.price = parseFloat(newPrice) || currentPrice;
-        }
-
-        if (
-          newQuantity !== null &&
-          parseInt(newQuantity) !== inventory.quantity
-        ) {
-          inventoryUpdates.quantity =
-            parseInt(newQuantity) || inventory.quantity;
-        }
-
-        // Include all required fields for the PUT request
-        if (Object.keys(inventoryUpdates).length > 0) {
-          const fullInventoryData = {
-            ...inventory,
-            ...inventoryUpdates,
-          };
-          updateInventory(inventory.id, fullInventoryData);
-        }
-      }
-
-      // If no inventory exists but price was provided, try to update via vaccine endpoint
-      if (
-        !inventory &&
-        newPrice !== null &&
-        parseFloat(newPrice) !== currentPrice
-      ) {
-        updateVaccine(vaccine.id, { price: parseFloat(newPrice) });
-      }
-    }
+      setVaccines(prev => prev.map(v => v.id === vaccine.id ? { ...v, name: form.name, Inventories: v.Inventories?.map((inv, i) => i === 0 ? { ...inv, price: parseFloat(form.price), quantity: parseInt(form.quantity) } : inv) } : v));
+      setEditModal({ open: false, vaccine: null });
+      showToast("Vaccine updated successfully! ✓");
+    } catch (err) { showToast(err.message, "error"); } finally { setEditLoading(false); }
   };
 
-  // Show loading while auth is being checked
-  if (authLoading) {
-    return (
-      <div className="p-6 text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
-      </div>
-    );
-  }
+  const handleDeleteVaccine = (v) => {
+    setConfirmDialog({
+      open: true,
+      title: "Delete Vaccine",
+      message: `Delete "${v.name}" from system inventory?`,
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, open: false }));
+        try {
+          await vaccineService.deleteVaccine(v.id, token);
+          setVaccines(prev => prev.filter(x => x.id !== v.id));
+          showToast("Vaccine deleted");
+        } catch (err) { showToast(err.message, "error"); }
+      }
+    });
+  };
 
-  // Check if user is admin
+  if (authLoading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><div className="w-10 h-10 border-4 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin" /></div>;
+
   const isAdmin = user?.email === ADMIN_EMAIL;
-
-  if (!user) {
-    return (
-      <div className="p-6 text-center">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <AlertTriangle className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-          <p className="text-yellow-800 font-medium">Not Logged In</p>
-          <p className="text-yellow-600 text-sm">
-            Please log in to access the admin panel.
-          </p>
-          <button
-            onClick={() => (window.location.href = "/")}
-            className="mt-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700"
-          >
-            Go to Login
-          </button>
-        </div>
+  if (!user || !isAdmin) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+      <div className="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full text-center border border-gray-100">
+        <Shield className="w-12 h-12 text-red-500 mx-auto mb-3" />
+        <h2 className="text-lg font-black text-slate-900 mb-1">Access Restricted</h2>
+        <p className="text-xs text-slate-500 mb-6">Admin credentials required to view this portal.</p>
+        <button onClick={() => window.location.href = "/"} className="w-full py-3 bg-emerald-600 text-white rounded-2xl font-extrabold text-xs">Return Home</button>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (!isAdmin) {
-    return (
-      <div className="p-6 text-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-          <p className="text-red-800 font-medium">Access Denied</p>
-          <p className="text-red-600 text-sm">
-            You don't have admin privileges.
-          </p>
-          <p className="text-red-500 text-xs mt-1">
-            Current user: {user?.email}
-          </p>
-          <button
-            onClick={() => (window.location.href = "/")}
-            className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Admin Dashboard
-        </h2>
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Group bookings by date for display
-  const { grouped: groupedBookings, sortedDateKeys } =
-    groupBookingsByDate(bookings);
+  const filteredVaccines = vaccines.filter(v => v.name?.toLowerCase().includes(vaccineSearch.toLowerCase()));
+  const filteredBookings = bookings.filter(b => extractUserName(b.userData).toLowerCase().includes(bookingSearch.toLowerCase()) || extractVaccineName(b).toLowerCase().includes(bookingSearch.toLowerCase()));
+  const { grouped: groupedBookings, sortedDateKeys } = groupBookingsByDate(filteredBookings);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Admin Dashboard
-        </h2>
-        <p className="text-gray-600">
-          Welcome back, Admin! Manage your vaccine booking system.
-        </p>
-        <p className="text-sm text-gray-500 mt-1">Logged in as: {user.email}</p>
-      </div>
+    <div className="min-h-screen bg-[#f8fafc] flex font-sans text-slate-800">
+      <Toast toast={toast} onClose={() => setToast(null)} />
+      <ConfirmDialog {...confirmDialog} onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))} />
+      <EditVaccineModal isOpen={editModal.open} vaccine={editModal.vaccine} onClose={() => setEditModal({ open: false, vaccine: null })} onSave={handleEditSave} loading={editLoading} />
+      <AddVaccineModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddVaccine} loading={addLoading} />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats.totalUsers}
-              </p>
+      {/* ===== CIVICPULSE SOLID EMERALD SIDEBAR ===== */}
+      <aside className="w-64 bg-[#059669] text-white flex flex-col justify-between flex-shrink-0 p-4 shadow-xl z-20">
+        
+        <div>
+          {/* Brand Header */}
+          <div className="flex items-center space-x-3 mb-6 px-2 pt-2">
+            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <Syringe className="w-5 h-5 text-white" />
             </div>
-            <Users className="h-8 w-8 text-blue-600" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Total Bookings
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats.totalBookings}
-              </p>
+              <h1 className="font-black text-white text-base tracking-tight leading-none">Bhalla Admin</h1>
+              <p className="text-[10px] text-emerald-100/80 font-bold uppercase tracking-wider mt-1">Vaccine Control Center</p>
             </div>
-            <Package className="h-8 w-8 text-green-600" />
           </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">
-                Pending Bookings
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats.pendingBookings}
-              </p>
-            </div>
-            <Calendar className="h-8 w-8 text-yellow-600" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">
-                Total Vaccines
-              </p>
-              <p className="text-2xl font-bold text-blue-900">
-                {stats.totalVaccines}
-              </p>
-            </div>
-            <Package className="h-8 w-8 text-blue-600" />
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            User Management
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Manage user accounts and permissions
-          </p>
-          <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-            View All Users
-          </button>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Booking Management
-          </h3>
-          <p className="text-gray-600 mb-4">
-            View and manage all vaccine bookings
-          </p>
+          {/* Big CTA Button (Matching CivicPulse "+ Report an Issue" green button) */}
           <button
-            onClick={fetchBookings}
-            disabled={bookingsLoading}
-            className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={() => setShowAddModal(true)}
+            className="w-full bg-[#047857] hover:bg-[#065f46] text-white font-extrabold py-3.5 px-4 rounded-2xl mb-6 shadow-md flex items-center justify-center space-x-2 text-xs transition-all active:scale-[0.98]"
           >
-            {bookingsLoading ? "Loading..." : "View All Bookings"}
+            <Plus className="w-4 h-4" />
+            <span>+ Add New Vaccine</span>
           </button>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Vaccine Management
-              </h3>
-              <p className="text-gray-600">
-                View all available vaccines and inventory
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAddVaccineModal(true)}
-              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
-            >
-              <Plus className="h-4 w-4" />
-              Add Vaccine
-            </button>
-          </div>
-          <button
-            onClick={fetchVaccines}
-            disabled={vaccinesLoading}
-            className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Eye className="h-4 w-4" />
-            {vaccinesLoading ? "Loading..." : "View Vaccines"}
-          </button>
-        </div>
-      </div>
-
-      {/* Add Vaccine Modal */}
-      {showAddVaccineModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Add New Vaccine
-                </h3>
+          {/* Nav Items (Matching CivicPulse Active White Capsule Style) */}
+          <nav className="space-y-1.5">
+            {[
+              { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+              { id: "vaccines", label: "Vaccines Inventory", icon: Syringe, count: vaccines.length },
+              { id: "bookings", label: "Customer Bookings", icon: Package, count: bookings.length },
+            ].map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
                 <button
-                  onClick={() => setShowAddVaccineModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                  disabled={addVaccineLoading}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                    isActive
+                      ? "bg-white text-[#047857] shadow-md shadow-emerald-900/10"
+                      : "text-emerald-50 hover:bg-emerald-600/60 hover:text-white"
+                  }`}
                 >
-                  <X className="h-6 w-6" />
+                  <div className="flex items-center space-x-3">
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </div>
+                  {tab.count > 0 && (
+                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isActive ? "bg-emerald-100 text-emerald-800" : "bg-emerald-800/80 text-emerald-100"}`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Profile Badge (Matching CivicPulse user badge at bottom left) */}
+        <div className="bg-[#047857]/90 rounded-2xl p-3 flex items-center justify-between border border-emerald-500/30">
+          <div className="flex items-center space-x-2.5 truncate">
+            <div className="w-8 h-8 bg-emerald-500 rounded-xl text-white font-extrabold flex items-center justify-center text-xs shadow-inner">
+              C
+            </div>
+            <div className="truncate text-left">
+              <p className="font-extrabold text-white text-xs truncate leading-none">chiragbhalla</p>
+              <p className="text-[10px] text-emerald-200 font-bold mt-0.5">Admin Account</p>
+            </div>
+          </div>
+          <button onClick={logout} className="p-1.5 text-emerald-200 hover:text-white hover:bg-emerald-600/50 rounded-lg transition-colors">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+
+      </aside>
+
+      {/* ===== MAIN CONTENT AREA ===== */}
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        
+        {/* Top Header Bar */}
+        <header className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+          <h2 className="text-xl font-black text-slate-900 tracking-tight capitalize">
+            {activeTab === "dashboard" ? "Admin Dashboard Overview" : activeTab === "vaccines" ? "Vaccine Inventory Database" : "Customer Booking Logs"}
+          </h2>
+          <div className="flex items-center space-x-3">
+            <div className="bg-slate-50 border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold text-slate-600 flex items-center space-x-1">
+              <Globe className="w-3.5 h-3.5 text-emerald-600" />
+              <span>English / Hindi</span>
+            </div>
+            <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 cursor-pointer hover:bg-slate-200">
+              <Bell className="w-4 h-4" />
+            </div>
+          </div>
+        </header>
+
+        <main className="p-8 max-w-7xl w-full mx-auto space-y-8">
+          
+          {/* DASHBOARD TAB */}
+          {activeTab === "dashboard" && (
+            <div className="space-y-8">
+              
+              {/* 4 Stat Cards in a Row (Matching CivicPulse pastel stat cards Image 4) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Syringe className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Vaccines</p>
+                    <p className="text-2xl font-black text-slate-900 mt-0.5">{stats.totalVaccines} <span className="text-xs font-normal text-emerald-600">+12/wk</span></p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">In Dispatch</p>
+                    <p className="text-2xl font-black text-slate-900 mt-0.5">{stats.pendingBookings} <span className="text-xs font-normal text-amber-600">37% total</span></p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Bookings</p>
+                    <p className="text-2xl font-black text-slate-900 mt-0.5">{stats.totalBookings} <span className="text-xs font-normal text-sky-600">100% verified</span></p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Satisfaction</p>
+                    <p className="text-2xl font-black text-slate-900 mt-0.5">4.9⭐ <span className="text-xs font-normal text-purple-600">99% support</span></p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                {/* Left 8 cols - Quick Inventory Table */}
+                <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-black text-slate-900">Recent Inventory Stocks</h3>
+                    <button onClick={() => { setActiveTab("vaccines"); fetchVaccines(); }} className="text-xs font-bold text-emerald-600 hover:underline">View All Vaccines →</button>
+                  </div>
+                  {vaccines.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-xs">
+                      Click "Vaccines Inventory" on the left menu to load live inventory details.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100">
+                      {vaccines.slice(0, 5).map(v => {
+                        const price = getVaccinePrice(v);
+                        const qty = getVaccineQuantity(v);
+                        return (
+                          <div key={v.id} className="py-3 flex items-center justify-between text-xs">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 font-bold">💉</div>
+                              <div>
+                                <p className="font-bold text-slate-900">{v.name}</p>
+                                <p className="text-[10px] text-slate-400">Age: {v.ageGroup || 'All ages'}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-slate-900">₹{price}</p>
+                              <p className={`text-[10px] font-semibold ${qty > 10 ? 'text-emerald-600' : 'text-amber-600'}`}>{qty} in stock</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right 4 cols - Quick Action Card */}
+                <div className="lg:col-span-4 bg-emerald-900 text-white rounded-3xl p-6 shadow-md flex flex-col justify-between">
+                  <div>
+                    <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
+                      <Sparkles className="w-5 h-5 text-emerald-300" />
+                    </div>
+                    <h3 className="text-lg font-black text-white mb-2">Bhalla Vaccine Pulse</h3>
+                    <p className="text-xs text-emerald-200/90 leading-relaxed mb-6">
+                      Sourced directly from authorized government labs. Ensure cold-chain safety for Prayagraj.
+                    </p>
+                  </div>
+                  <button onClick={() => setShowAddModal(true)} className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-2xl text-xs shadow-lg transition-all">
+                    + Add Vaccine Entry
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* VACCINES TAB */}
+          {activeTab === "vaccines" && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Vaccine Inventory</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">{vaccines.length} items registered</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input type="text" placeholder="Search vaccine..." value={vaccineSearch} onChange={e => setVaccineSearch(e.target.value)} className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50" />
+                  </div>
+                  <button onClick={fetchVaccines} className="p-2 border border-gray-200 rounded-xl hover:bg-slate-50 text-slate-600"><RefreshCw className={`w-4 h-4 ${vaccinesLoading ? 'animate-spin' : ''}`} /></button>
+                </div>
+              </div>
+
+              {vaccinesLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => <div key={i} className="bg-white h-40 rounded-3xl animate-pulse" />)}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredVaccines.map(v => {
+                    const price = getVaccinePrice(v);
+                    const qty = getVaccineQuantity(v);
+                    const inv = v.Inventories?.[0];
+                    return (
+                      <div key={v.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-extrabold text-slate-900 text-sm">{v.name}</h4>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">{v.ageGroup || 'All ages'}</span>
+                          </div>
+                          <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full ${qty > 10 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                            {qty > 10 ? 'In Stock' : 'Low Stock'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs bg-slate-50 p-2.5 rounded-2xl">
+                          <div><p className="text-[9px] font-bold text-slate-400">PRICE</p><p className="font-black text-slate-900">₹{price}</p></div>
+                          <div><p className="text-[9px] font-bold text-slate-400">QTY</p><p className="font-black text-slate-900">{qty}</p></div>
+                          <div><p className="text-[9px] font-bold text-slate-400">BATCH</p><p className="font-black text-slate-900 truncate">{inv?.batchNumber || 'N/A'}</p></div>
+                        </div>
+
+                        <div className="flex space-x-2 pt-2">
+                          <button onClick={() => setEditModal({ open: true, vaccine: v })} className="flex-1 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors flex items-center justify-center space-x-1">
+                            <Edit2 className="w-3.5 h-3.5" /><span>Edit</span>
+                          </button>
+                          <button onClick={() => handleDeleteVaccine(v)} className="flex-1 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors flex items-center justify-center space-x-1">
+                            <Trash2 className="w-3.5 h-3.5" /><span>Delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BOOKINGS TAB */}
+          {activeTab === "bookings" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900">All Customer Bookings ({bookings.length})</h3>
+                <button onClick={fetchBookings} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 flex items-center space-x-2">
+                  <RefreshCw className={`w-3.5 h-3.5 ${bookingsLoading ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
                 </button>
               </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.target);
-                  const vaccineData = {
-                    name: formData.get("name"),
-                    ageGroup: formData.get("ageGroup"),
-                    description: formData.get("description"),
-                    quantity: formData.get("quantity"),
-                    price: formData.get("price"),
-                    batchNumber: formData.get("batchNumber"),
-                    expiryDate: formData.get("expiryDate"),
-                    manufacturedDate: formData.get("manufacturedDate"),
-                    manufacturer: formData.get("manufacturer"),
-                    imageUrl: formData.get("imageUrl"),
-                  };
-                  addVaccine(vaccineData);
-                }}
-              >
-                <div className="space-y-6">
-                  {/* Vaccine Information */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                      Vaccine Information
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Vaccine Name *
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., COVID-19 Vaccine"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Age Group *
-                        </label>
-                        <select
-                          name="ageGroup"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Age Group</option>
-                          <option value="0-2 years">0-2 years</option>
-                          <option value="2-5 years">2-5 years</option>
-                          <option value="5-12 years">5-12 years</option>
-                          <option value="12-18 years">12-18 years</option>
-                          <option value="18+ years">18+ years</option>
-                          <option value="All ages">All ages</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        name="description"
-                        rows="3"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Brief description of the vaccine..."
-                      ></textarea>
-                    </div>
-                  </div>
-
-                  {/* Inventory Information */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                      Inventory Information
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Quantity *
-                        </label>
-                        <input
-                          type="number"
-                          name="quantity"
-                          required
-                          min="0"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., 100"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Price (₹) *
-                        </label>
-                        <input
-                          type="number"
-                          name="price"
-                          required
-                          min="0"
-                          step="0.01"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., 500.00"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Batch Number *
-                        </label>
-                        <input
-                          type="text"
-                          name="batchNumber"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., BT2024001"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Manufacturer *
-                        </label>
-                        <input
-                          type="text"
-                          name="manufacturer"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., Pfizer Inc."
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Manufactured Date *
-                        </label>
-                        <input
-                          type="date"
-                          name="manufacturedDate"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Expiry Date *
-                        </label>
-                        <input
-                          type="date"
-                          name="expiryDate"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Image URL*
-                        </label>
-                        <input
-                          type="url"
-                          name="imageUrl"
-                          required
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="https://example.com/image.jpg"
-                        />
-                      </div>
-                    </div>
-                  </div>
+              {bookingsLoading ? (
+                <div className="space-y-4">
+                  {[...Array(4)].map((_, i) => <div key={i} className="bg-white h-24 rounded-3xl animate-pulse" />)}
                 </div>
-
-                {/* Form Actions */}
-                <div className="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddVaccineModal(false)}
-                    disabled={addVaccineLoading}
-                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={addVaccineLoading}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {addVaccineLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Adding...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4" />
-                        Add Vaccine
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bookings Error Display */}
-      {bookingsError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <p className="text-red-800 font-medium">Error fetching bookings</p>
-          </div>
-          <p className="text-red-600 text-sm mt-1">{bookingsError}</p>
-        </div>
-      )}
-
-      {/* Vaccines Error Display */}
-      {vaccinesError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <p className="text-red-800 font-medium">Error fetching vaccines</p>
-          </div>
-          <p className="text-red-600 text-sm mt-1">{vaccinesError}</p>
-        </div>
-      )}
-
-      {/* Vaccines Display */}
-      {vaccines.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border mb-8">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              All Vaccines ({vaccines.length})
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Complete vaccine inventory
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="max-h-64 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {vaccines.map((vaccine, index) => (
-                  <div
-                    key={vaccine.id || index}
-                    className="p-4 border border-gray-200 rounded-lg bg-gray-50"
-                  >
-                    <h4 className="font-semibold text-gray-900 mb-2">
-                      {vaccine.name || "Unknown Vaccine"}
-                    </h4>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div>
-                        <span className="font-medium">ID:</span>{" "}
-                        {vaccine.id || "N/A"}
-                      </div>
-                      <div>
-                        <span className="font-medium">Price:</span> ₹
-                        {getVaccinePrice(vaccine)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Quantity:</span>{" "}
-                        {getVaccineQuantity(vaccine)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Age Group:</span>{" "}
-                        {vaccine.ageGroup || "N/A"}
-                      </div>
-                      {vaccine.Inventories &&
-                        vaccine.Inventories.length > 0 && (
-                          <>
-                            <div>
-                              <span className="font-medium">Batch:</span>{" "}
-                              {vaccine.Inventories[0].batchNumber || "N/A"}
-                            </div>
-                            <div>
-                              <span className="font-medium">Expiry:</span>{" "}
-                              {vaccine.Inventories[0].expiryDate
-                                ? new Date(
-                                    vaccine.Inventories[0].expiryDate
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </div>
-                          </>
-                        )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 mt-4">
-                      <button
-                        onClick={() => handleQuickUpdate(vaccine)}
-                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
-                      >
-                        <Edit2 className="h-3 w-3" />
-                        Update
-                      </button>
-                      <button
-                        onClick={() => deleteVaccine(vaccine.id)}
-                        className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        Delete
-                      </button>
-                    </div>
-
-                    <details className="mt-3">
-                      <summary className="cursor-pointer text-sm text-purple-600 hover:text-purple-800">
-                        View Full Data
-                      </summary>
-                      <div className="mt-2 text-xs text-gray-600 bg-white p-3 rounded">
-                        <pre className="overflow-x-auto">
-                          {JSON.stringify(vaccine, null, 2)}
-                        </pre>
-                      </div>
-                    </details>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bookings Display - Grouped by Date - Extended Height */}
-      {bookings.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              All Bookings ({bookings.length})
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Grouped by date, latest first
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="max-h-[80vh] overflow-y-auto">
-              {sortedDateKeys.map((dateKey) => (
-                <div key={dateKey} className="mb-6 last:mb-0">
-                  {/* Date Header */}
-                  <div className="sticky top-0 bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 z-10">
-                    <h4 className="font-medium text-gray-900 text-center">
-                      {dateKey}
-                    </h4>
-                    <p className="text-sm text-gray-500 text-center">
-                      {groupedBookings[dateKey]?.length || 0} booking
-                      {(groupedBookings[dateKey]?.length || 0) !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-
-                  {/* Bookings for this date */}
-                  <div className="space-y-3 ml-4">
-                    {(groupedBookings[dateKey] || []).map((booking, index) => {
-                      const { date, time } = extractDateTimeFromCreatedAt(
-                        booking.createdAt
-                      );
-                      const vaccineName = extractVaccineName(booking);
-                      const userName = extractUserName(booking.userData);
-
-                      return (
-                        <div
-                          key={booking.id || index}
-                          className="p-4 border border-gray-200 rounded-lg bg-gray-50/50"
-                        >
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                ID:
-                              </span>
-                              <span className="ml-2 text-gray-600">
-                                {booking.id || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                User:
-                              </span>
-                              <span className="ml-2 text-gray-600 font-medium">
-                                {userName}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                Time:
-                              </span>
-                              <span className="ml-2 text-gray-600">{time}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                Vaccine:
-                              </span>
-                              <span className="ml-2 text-gray-600">
-                                {vaccineName}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                Cost:
-                              </span>
-                              <span className="ml-2 text-gray-600">
-                                ₹{booking.totalCost || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">
-                                Status:
-                              </span>
-                              <span
-                                className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                                  booking.status === "confirmed"
-                                    ? "bg-green-100 text-green-800"
-                                    : booking.status === "pending"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : booking.status === "InProcess"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : booking.status === "Booked"
-                                    ? "bg-purple-100 text-purple-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {booking.status || "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                          {/* Show full booking data in collapsed format */}
-                          <details className="mt-3">
-                            <summary className="cursor-pointer text-sm text-blue-600 hover:text-blue-800">
-                              View Full Data
-                            </summary>
-                            <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-3 rounded">
-                              <div className="mb-2 text-blue-600 font-medium">
-                                Available Fields:
-                              </div>
-                              <div className="mb-2">
-                                {Object.keys(booking).map((key) => (
-                                  <span
-                                    key={key}
-                                    className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1 mb-1"
-                                  >
-                                    {key}: {typeof booking[key]}{" "}
-                                    {booking[key] &&
-                                    booking[key].toString().length > 50
-                                      ? "(long)"
-                                      : `(${booking[key]})`}
-                                  </span>
-                                ))}
-                              </div>
-                              <pre className="overflow-x-auto">
-                                {JSON.stringify(booking, null, 2)}
-                              </pre>
-                            </div>
-                          </details>
+              ) : (
+                <div className="space-y-4">
+                  {bookings.map(b => (
+                    <div key={b.id} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between text-xs">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-bold">
+                          📦
                         </div>
-                      );
-                    })}
-                  </div>
+                        <div>
+                          <p className="font-extrabold text-slate-900 text-sm">{extractUserName(b.userData)}</p>
+                          <p className="text-slate-400">Order #{b.id} • {extractVaccineName(b)}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-black text-slate-900 text-sm">₹{b.totalCost || '0'}</p>
+                        <span className="inline-block px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
+                          {b.status || 'Confirmed'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        </div>
-      )}
+          )}
+
+        </main>
+      </div>
+
     </div>
   );
 }

@@ -1,4 +1,5 @@
 export const getVaccinePrice = (vaccine) => {
+  if (!vaccine) return 'N/A';
   if (vaccine.price) return vaccine.price;
   if (vaccine.Inventories && vaccine.Inventories.length > 0) {
     return vaccine.Inventories[0].price;
@@ -8,15 +9,17 @@ export const getVaccinePrice = (vaccine) => {
 
 // Extract vaccine quantity from vaccine data
 export const getVaccineQuantity = (vaccine) => {
+  if (!vaccine) return 0;
   if (vaccine.quantity) return vaccine.quantity;
   if (vaccine.Inventories && vaccine.Inventories.length > 0) {
     return vaccine.Inventories.reduce((total, inv) => total + (inv.quantity || 0), 0);
   }
-  return 'N/A';
+  return 0;
 };
 
 // Get inventory details
 export const getInventoryDetails = (vaccine) => {
+  if (!vaccine) return null;
   if (vaccine.Inventories && vaccine.Inventories.length > 0) {
     return vaccine.Inventories[0];
   }

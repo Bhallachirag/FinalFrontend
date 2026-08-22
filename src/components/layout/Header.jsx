@@ -1,95 +1,156 @@
 import React, { useState, useContext } from "react";
 import { Link } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, ChevronDown, MapPin, Phone, Syringe } from "lucide-react";
+import { ShoppingCart, User, Globe, Syringe, LogOut, Package, Shield, ChevronDown } from "lucide-react";
 import { AuthContext } from '../../stores/authStore.js';
 import LoginModal from '../auth/LoginModal.jsx';
 
 const Header = ({ onCartClick, cartItems }) => {
   const { user, logout } = useContext(AuthContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
-  <header className="bg-white shadow-lg sticky top-0 z-50 w-full">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center h-16">
-        {/* Left side - Logo */}
-        <div className="flex-shrink-0 flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r bg-blue-500 rounded-lg flex items-center justify-center">
-            <Syringe className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-2xl font-bold bg-gradient-to-r text-blue-600">
-            BhallaDistributors
-          </span>
-        </div>
+    <>
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50 w-full font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
 
-        {/* Right side - Actions */}
-        <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center space-x-1 text-sm text-gray-600">
-            <MapPin className="w-4 h-4" />
-            <span>Prayagraj, 211003</span>
-          </div>
-
-          <button
-            onClick={onCartClick}
-            className="relative p-2 text-gray-600 hover:text-black transition-colors"
-          >
-            <ShoppingCart className="w-6 h-6" />
-            {cartItems.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {cartItems.length}
-              </span>
-            )}
-          </button>
-
-          {user ? (
-            <div className="relative flex-shrink-0">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <User className="w-6 h-6 text-gray-600" />
-                <span className="hidden md:block text-sm font-medium text-gray-700">
-                  {user.email}
+            {/* Left - Logo & Subtitle (CivicPulse style) */}
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:bg-emerald-700 transition-colors">
+                <Syringe className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-extrabold text-gray-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                  bhalladistributors<span className="text-emerald-600">.</span>
                 </span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1">
+                  Healthcare & Vaccine Care
+                </span>
+              </div>
+            </Link>
+
+            {/* Center Nav - Desktop */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#vaccines" className="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition-colors">
+                Vaccines
+              </a>
+              <a href="#how-it-works" className="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition-colors">
+                How It Works
+              </a>
+              <a href="#features" className="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition-colors">
+                Why Us
+              </a>
+              <a href="#contact" className="text-sm font-semibold text-gray-600 hover:text-emerald-600 transition-colors">
+                Contact
+              </a>
+            </nav>
+
+            {/* Right Actions */}
+            <div className="flex items-center space-x-4">
+              
+              {/* Language Selector Pill */}
+              <div className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200/80 px-3 py-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors">
+                <Globe className="w-3.5 h-3.5 text-gray-500" />
+                <span>हिंदी / English</span>
+              </div>
+
+              {/* Cart Button */}
+              <button
+                onClick={onCartClick}
+                className="relative p-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[11px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                    {cartItems.length}
+                  </span>
+                )}
               </button>
-              {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
-                  <Link
-                    to="/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    My Orders
-                  </Link>
+
+              {/* Auth Buttons */}
+              {user ? (
+                <div className="relative">
                   <button
-                    onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-xl border border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all"
                   >
-                    Logout
+                    <div className="w-7 h-7 bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-xs">
+                      {user.email[0].toUpperCase()}
+                    </div>
+                    <span className="hidden sm:block text-xs font-bold text-gray-800 max-w-[110px] truncate">
+                      {user.email.split('@')[0]}
+                    </span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showUserMenu && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setShowUserMenu(false)} />
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-20 animate-in fade-in slide-in-from-top-2">
+                        <div className="px-4 py-2.5 border-b border-gray-100">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Signed in as</p>
+                          <p className="text-xs font-bold text-gray-900 truncate">{user.email}</p>
+                        </div>
+                        <Link
+                          to="/orders"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center space-x-3 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                        >
+                          <Package className="w-4 h-4 text-emerald-600" />
+                          <span>My Bookings & Orders</span>
+                        </Link>
+                        {user.email === 'chiragbhalla03@gmail.com' && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setShowUserMenu(false)}
+                            className="flex items-center space-x-3 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                          >
+                            <Shield className="w-4 h-4 text-emerald-600" />
+                            <span>Admin Portal</span>
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => { logout(); setShowUserMenu(false); }}
+                          className="flex items-center space-x-3 w-full px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="text-xs font-bold text-gray-700 hover:text-emerald-600 px-4 py-2.5 rounded-xl transition-colors uppercase tracking-wider"
+                  >
+                    LOGIN
+                  </button>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-emerald-600/20 uppercase tracking-wider"
+                  >
+                    SIGN UP
                   </button>
                 </div>
               )}
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="flex-shrink-0 whitespace-nowrap bg-blue-500 text-white px-1 sm:px-2 py-2 rounded-lg hover:bg-neutral-200 hover:text-black transition-colors font-medium"
-            >
-              Login
-            </button>
-          )}
-        </div>
-      </div>
 
-      <LoginModal 
-        isOpen={showLoginModal} 
+            </div>
+
+          </div>
+        </div>
+      </header>
+
+      <LoginModal
+        isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         onLoginSuccess={() => setShowLoginModal(false)}
       />
-    </div>
-  </header>
+    </>
   );
 };
 
