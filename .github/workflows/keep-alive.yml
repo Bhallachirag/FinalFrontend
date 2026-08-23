@@ -2,8 +2,10 @@ name: Keep Render and Aiven Alive
 
 on:
   schedule:
-    # Runs every 14 minutes to prevent Render free tier from sleeping and keep Aiven MySQL active
-    - cron: '*/14 * * * *'
+    # Runs once every 24 hours at midnight UTC
+    # This prevents Aiven from powering off (needs activity every few days)
+    # while preserving Render's 750 free instance hours per month.
+    - cron: '0 0 * * *'
   workflow_dispatch: # Allows manual triggering from GitHub UI
 
 jobs:
