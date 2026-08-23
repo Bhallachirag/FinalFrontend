@@ -1,0 +1,20 @@
+name: Keep Render and Aiven Alive
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render free tier from sleeping and keep Aiven MySQL active
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  ping-services:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping VaccineAndSearch Service
+        run: curl -sSf https://vaccineandsearchservice-1.onrender.com/api/v1/vaccines > /dev/null || echo "Ping failed"
+      
+      - name: Ping Auth Service
+        run: curl -sSf https://auth-service-juib.onrender.com/api/v1/info > /dev/null || echo "Ping Auth failed"
+
+      - name: Ping Booking Service
+        run: curl -sSf https://vaccinebookingservice.onrender.com/api/v1/info > /dev/null || echo "Ping Booking failed"
