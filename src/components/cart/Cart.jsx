@@ -18,8 +18,18 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
     }
     setIsProcessing(true);
     try {
+      // Extract numeric userId from JWT token payload
+      let userId = user.id;
+      if (!userId && token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userId = payload.id;
+        } catch (e) {
+          userId = user.email; // fallback
+        }
+      }
       const checkoutData = {
-        userId: user.id || user.email,
+        userId: userId || user.email,
         cartItems: items.map(item => ({
           id: item.vaccineId,
           quantity: item.quantity,
