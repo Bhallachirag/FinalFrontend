@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 
-const SearchFilter = ({ onSearch, onFilter }) => {
+const SearchFilter = ({ onSearch, onFilter, children }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState({ priceRange: "", availability: "", sortBy: "" });
   const [openSections, setOpenSections] = useState({ priceRange: true, availability: true, sortBy: true });
@@ -205,6 +205,11 @@ const SearchFilter = ({ onSearch, onFilter }) => {
             </button>
           </div>
         )}
+
+        {/* Vaccine List Children */}
+        <div className="w-full">
+          {children}
+        </div>
 
       </div>
 
