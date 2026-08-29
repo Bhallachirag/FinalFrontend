@@ -95,14 +95,6 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
   return (
     <div className="relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200/80 flex flex-col justify-between">
 
-      {/* Wishlist Button */}
-      <button
-        onClick={() => setIsWishlisted(!isWishlisted)}
-        className="absolute top-4 right-4 p-1.5 bg-slate-100/80 backdrop-blur-md rounded-full hover:bg-slate-200 transition-all z-20"
-      >
-        <Heart className={`w-3.5 h-3.5 ${isWishlisted ? "text-rose-500 fill-current scale-110" : "text-slate-400"}`} />
-      </button>
-
       {/* Clean White Outer Area around the Inner Vaccine Box */}
       <div className="p-3.5 bg-white">
         
