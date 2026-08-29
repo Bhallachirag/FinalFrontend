@@ -74,23 +74,31 @@ const HomePage = () => {
     setFilteredVaccines(vaccines.filter(v => v.name.toLowerCase().includes(searchTerm.toLowerCase())));
   };
 
-  const handleFilter = (filterType, value) => {
+  const currentFiltersRef = React.useRef({ priceRange: "", availability: "", sortBy: "" });
+
+  const applyAllFilters = (filtersObj) => {
     let filtered = [...vaccines];
-    if (filterType === "priceRange" && value) {
+    const { priceRange, availability, sortBy } = filtersObj;
+    if (priceRange) {
       const ranges = { "0-1000": [0,1000], "1000-3000": [1001,3000], "3000-5000": [3001,5000], "5000+": [5001,Infinity] };
-      const [min, max] = ranges[value] || [0, Infinity];
+      const [min, max] = ranges[priceRange] || [0, Infinity];
       filtered = filtered.filter(v => v.inventory.price >= min && v.inventory.price <= max);
     }
-    if (filterType === "availability" && value) {
-      if (value === "inStock") filtered = filtered.filter(v => v.inventory.quantity > 10);
-      else if (value === "lowStock") filtered = filtered.filter(v => v.inventory.quantity > 0 && v.inventory.quantity <= 10);
+    if (availability) {
+      if (availability === "inStock") filtered = filtered.filter(v => v.inventory.quantity > 10);
+      else if (availability === "lowStock") filtered = filtered.filter(v => v.inventory.quantity > 0 && v.inventory.quantity <= 10);
     }
-    if (filterType === "sortBy" && value) {
-      if (value === "priceLowToHigh") filtered.sort((a,b) => a.inventory.price - b.inventory.price);
-      else if (value === "priceHighToLow") filtered.sort((a,b) => b.inventory.price - a.inventory.price);
-      else if (value === "nameAZ") filtered.sort((a,b) => a.name.localeCompare(b.name));
+    if (sortBy) {
+      if (sortBy === "priceLowToHigh") filtered.sort((a,b) => a.inventory.price - b.inventory.price);
+      else if (sortBy === "priceHighToLow") filtered.sort((a,b) => b.inventory.price - a.inventory.price);
+      else if (sortBy === "nameAZ") filtered.sort((a,b) => a.name.localeCompare(b.name));
     }
     setFilteredVaccines(filtered);
+  };
+
+  const handleFilter = (filterType, value) => {
+    currentFiltersRef.current = { ...currentFiltersRef.current, [filterType]: value };
+    applyAllFilters(currentFiltersRef.current);
   };
 
   const handleAddToCart = (vaccine, inventory) => {
