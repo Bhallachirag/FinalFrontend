@@ -95,13 +95,6 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
   return (
     <div className="relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200/80 flex flex-col justify-between">
 
-      {/* Discount Badge */}
-      {discountPercentage > 0 && (
-        <div className="absolute top-4 left-4 bg-emerald-600 text-white px-2.5 py-0.5 rounded-full text-[9px] font-black z-20 shadow-md">
-          {discountPercentage}% OFF
-        </div>
-      )}
-
       {/* Wishlist Button */}
       <button
         onClick={() => setIsWishlisted(!isWishlisted)}
@@ -169,13 +162,18 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
             </div>
           </div>
 
-          <div className="flex items-baseline space-x-2">
+          <div className="flex items-center space-x-2">
             <span className="text-2xl font-black text-slate-900">
               ₹{inventory.price.toLocaleString('en-IN')}
             </span>
             {vaccine.mrp > inventory.price && (
               <span className="text-xs text-slate-400 line-through">
                 ₹{vaccine.mrp.toLocaleString('en-IN')}
+              </span>
+            )}
+            {discountPercentage > 0 && (
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-md border border-emerald-200 shadow-sm">
+                {discountPercentage}% OFF
               </span>
             )}
           </div>
