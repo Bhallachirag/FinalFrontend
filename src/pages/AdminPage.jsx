@@ -27,8 +27,9 @@ const Toast = ({ toast, onClose }) => {
 };
 
 // Confirm Dialog
-const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
-  if (!isOpen) return null;
+const ConfirmDialog = ({ open, isOpen, title, message, onConfirm, onCancel }) => {
+  const show = open !== undefined ? open : isOpen;
+  if (!show) return null;
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onCancel} />
@@ -369,7 +370,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] flex font-sans text-slate-800">
       <Toast toast={toast} onClose={() => setToast(null)} />
-      <ConfirmDialog {...confirmDialog} onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))} />
+      <ConfirmDialog {...confirmDialog} isOpen={confirmDialog.open} open={confirmDialog.open} onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))} />
       <EditVaccineModal isOpen={editModal.open} vaccine={editModal.vaccine} onClose={() => setEditModal({ open: false, vaccine: null })} onSave={handleEditSave} loading={editLoading} />
       <AddVaccineModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddVaccine} loading={addLoading} />
 
