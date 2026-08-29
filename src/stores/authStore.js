@@ -46,7 +46,7 @@ export class AuthStore {
   }
 
   isAdmin() {
-    return this.user?.email === 'chirag@admin.com';
+    return this.user?.email === 'chiragbhalla03@gmail.com';
   }
 
   clear() {
