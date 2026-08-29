@@ -17,8 +17,8 @@ const Header = ({ onCartClick, cartItems }) => {
 
             {/* Left - Logo & Subtitle (CivicPulse style) */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:bg-emerald-700 transition-colors">
-                <Syringe className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md border border-gray-100 overflow-hidden p-1">
+                <img src="/logo.png" alt="Bhalla Distributors Logo" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-extrabold text-gray-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
