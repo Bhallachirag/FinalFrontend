@@ -182,7 +182,7 @@ export default function MyOrders() {
             </div>
             <div className="truncate text-left">
               <p className="font-extrabold text-white text-xs truncate leading-none">{user.email.split('@')[0]}</p>
-              <p className="text-[10px] text-emerald-200 font-bold mt-0.5">Citizen / Patient</p>
+              <p className="text-[10px] text-emerald-200 font-bold mt-0.5">System Admin & Owner</p>
             </div>
           </div>
           <button onClick={logout} className="p-1.5 text-emerald-200 hover:text-white hover:bg-emerald-600/50 rounded-lg transition-colors">
