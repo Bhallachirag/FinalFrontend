@@ -94,13 +94,13 @@ const HomePage = () => {
   };
 
   const handleAddToCart = (vaccine, inventory) => {
-    const existing = cartItems.find(i => i.vaccineId === vaccine.vaccineId && i.inventoryId === inventory.id);
+    const existing = cartItems.find(i => i.vaccineId === vaccine.id && i.inventoryId === inventory.id);
     if (existing) {
-      setCartItems(cartItems.map(i => i.vaccineId === vaccine.vaccineId && i.inventoryId === inventory.id ? { ...i, quantity: i.quantity + 1 } : i));
+      setCartItems(cartItems.map(i => i.vaccineId === vaccine.id && i.inventoryId === inventory.id ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      setCartItems([...cartItems, { id: vaccine.id, vaccineId: vaccine.vaccineId, inventoryId: inventory.id, name: vaccine.name, price: inventory.price, batchNumber: inventory.batchNumber, quantity: 1, maxQuantity: inventory.quantity }]);
+      setCartItems([...cartItems, { id: vaccine.id, vaccineId: vaccine.id, inventoryId: inventory.id, name: vaccine.name, price: inventory.price, batchNumber: inventory.batchNumber, quantity: 1, maxQuantity: inventory.quantity }]);
     }
-    showNotification(`✓ ${vaccine.name} added to booking cart!`);
+    showNotification(`🧪 ${vaccine.name} added to booking cart!`);
   };
 
   const handleUpdateCartQuantity = (item, newQuantity) => {
