@@ -31,7 +31,8 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
       const checkoutData = {
         userId: userId || user.email,
         cartItems: items.map(item => ({
-          id: item.vaccineId,
+          id: item.vaccineId || item.id,
+          vaccineId: item.vaccineId || item.id,
           quantity: item.quantity,
           price: item.price,
           name: item.name
