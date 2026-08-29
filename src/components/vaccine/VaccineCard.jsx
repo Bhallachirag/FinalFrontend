@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Heart, ShoppingBag, Star, Check, ShieldCheck, Sparkles, Package, Shield, Minus, Plus } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 // Theme styling for the pharmaceutical vaccine box packaging
 const getVaccineBoxTheme = (name = "") => {
@@ -71,6 +72,7 @@ const getVaccineBoxTheme = (name = "") => {
 };
 
 const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, cartItems = [] }) => {
+  const { t } = useLanguage();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -90,10 +92,10 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, ca
   const theme = getVaccineBoxTheme(vaccine.name);
 
   const stockStatus = inventory.quantity > 10
-    ? { label: "In Stock", color: "text-emerald-700", bg: "bg-emerald-50", dot: "bg-emerald-500" }
+    ? { label: t("inStock"), color: "text-emerald-700", bg: "bg-emerald-50", dot: "bg-emerald-500" }
     : inventory.quantity > 0
-    ? { label: "Low Stock", color: "text-amber-700", bg: "bg-amber-50", dot: "bg-amber-500" }
-    : { label: "Out of Stock", color: "text-red-700", bg: "bg-red-50", dot: "bg-red-500" };
+    ? { label: t("lowStock"), color: "text-amber-700", bg: "bg-amber-50", dot: "bg-amber-500" }
+    : { label: t("outOfStock"), color: "text-red-700", bg: "bg-red-50", dot: "bg-red-500" };
 
   return (
     <div className="relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200/80 flex flex-col justify-between">
@@ -118,7 +120,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, ca
             {/* Medicine Box Sub-tag */}
             <div className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-md border text-[9px] font-black tracking-wide ${theme.badgeBg}`}>
               <ShieldCheck className="w-2.5 h-2.5" />
-              <span>COLD CHAIN 2°C - 8°C</span>
+              <span>{t("coldChain")}</span>
             </div>
 
             {/* Vaccine Name printed on top of the packaging box */}
@@ -136,7 +138,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, ca
           {/* Bottom Box Footer Stripe (Batch & Authenticity) */}
           <div className="bg-slate-100/90 border-t border-slate-200/80 px-3 py-1.5 flex items-center justify-between text-[9px] font-mono text-slate-500">
             <span className="font-bold">BATCH: {inventory.batchNumber || 'BTH001'}</span>
-            <span className={`font-black uppercase ${theme.accentText}`}>VERIFIED VACCINE</span>
+            <span className={`font-black uppercase ${theme.accentText}`}>{t("verifiedVaccine")}</span>
           </div>
 
         </div>
@@ -191,7 +193,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, ca
 
             <div className="flex flex-col items-center px-2">
               <span className="text-sm font-black text-emerald-950">{quantityInCart}</span>
-              <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-tighter">In Cart</span>
+              <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-tighter">{t("inCart")}</span>
             </div>
 
             <button
@@ -218,12 +220,12 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, ca
             {added ? (
               <>
                 <Check className="w-4 h-4 text-white" />
-                <span>Added to Booking Cart!</span>
+                <span>{t("addedToCart")}</span>
               </>
             ) : (
               <>
                 <ShoppingBag className="w-4 h-4" />
-                <span>{inventory.quantity === 0 ? "Out of Stock" : "Add to Cart"}</span>
+                <span>{inventory.quantity === 0 ? t("outOfStock") : t("addToCart")}</span>
               </>
             )}
           </button>

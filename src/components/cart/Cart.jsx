@@ -1,10 +1,12 @@
 import React, { useState, useContext } from "react";
 import { X, ShoppingCart, User, Plus, Minus, Lock, Syringe, ArrowRight, Trash2 } from "lucide-react";
 import { AuthContext } from '../../stores/authStore.js';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import bookingService from '../../services/bookingService.js';
 import LoginModal from '../auth/LoginModal.jsx';
 
 const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }) => {
+  const { t } = useLanguage();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { user, token } = useContext(AuthContext);
@@ -73,8 +75,8 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
                 <ShoppingCart className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-base font-black text-slate-900">Your Vaccine Booking Cart</h2>
-                <p className="text-xs text-slate-400 font-bold">{itemCount} item{itemCount !== 1 ? 's' : ''}</p>
+                <h2 className="text-base font-black text-slate-900">{t("cartTitle")}</h2>
+                <p className="text-xs text-slate-400 font-bold">{itemCount} {t("items")}</p>
               </div>
             </div>
             <button
@@ -151,15 +153,15 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
             <div className="px-6 py-5 border-t border-gray-100 bg-white space-y-4">
               <div className="bg-slate-50 rounded-2xl p-4 space-y-2 text-xs">
                 <div className="flex justify-between text-slate-500 font-medium">
-                  <span>Subtotal ({itemCount} items)</span>
+                  <span>{t("subtotal")} ({itemCount} {t("items")})</span>
                   <span>₹{total.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between text-slate-500 font-medium">
-                  <span>Cold-Chain Shipping</span>
-                  <span className="text-emerald-600 font-extrabold">FREE</span>
+                  <span>{t("coldChainShipping")}</span>
+                  <span className="text-emerald-600 font-extrabold">{t("free")}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-2 flex justify-between font-black text-slate-900 text-sm">
-                  <span>Total Amount</span>
+                  <span>{t("totalAmount")}</span>
                   <span className="text-emerald-600">₹{total.toLocaleString('en-IN')}</span>
                 </div>
               </div>
@@ -184,7 +186,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }
                 ) : !user ? (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>Login to Complete Booking</span>
+                    <span>{t("loginToComplete")}</span>
                   </>
                 ) : (
                   <>
