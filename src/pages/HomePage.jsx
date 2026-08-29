@@ -10,8 +10,10 @@ import VaccineCard from "../components/vaccine/VaccineCard.jsx";
 import Cart from "../components/cart/Cart.jsx";
 import { transformVaccineData } from "../utils/helpers.js";
 import vaccineService from "../services/vaccineService.js";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 const HomePage = () => {
+  const { t } = useLanguage();
   const [vaccines, setVaccines] = useState([]);
   const [filteredVaccines, setFilteredVaccines] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -568,12 +570,12 @@ const HomePage = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
               <span className="text-xs font-extrabold text-emerald-600 uppercase tracking-widest">
-                VERIFIED INVENTORY
+                {t("verifiedInventory")}
               </span>
-              <h2 className="text-3xl font-black text-slate-900 mt-1">Available Vaccines</h2>
+              <h2 className="text-3xl font-black text-slate-900 mt-1">{t("availableVaccines")}</h2>
             </div>
             <p className="text-xs text-slate-500 mt-2 md:mt-0">
-              Showing {filteredVaccines.length} verified products available in Prayagraj
+              {t("showingProducts", { count: filteredVaccines.length })}
             </p>
           </div>
 

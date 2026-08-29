@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 const SearchFilter = ({ onSearch, onFilter, children }) => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState({ priceRange: "", availability: "", sortBy: "" });
   const [openSections, setOpenSections] = useState({ priceRange: true, availability: true, sortBy: true });
@@ -29,19 +31,19 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
 
   const priceOptions = [
-    { value: "0-1000", label: "Under ₹1,000" },
-    { value: "1000-3000", label: "₹1,000 – ₹3,000" },
-    { value: "3000-5000", label: "₹3,000 – ₹5,000" },
-    { value: "5000+", label: "Above ₹5,000" },
+    { value: "0-1000", label: t("under1k") },
+    { value: "1000-3000", label: t("from1kTo3k") },
+    { value: "3000-5000", label: t("from3kTo5k") },
+    { value: "5000+", label: t("above5k") },
   ];
   const availOptions = [
-    { value: "inStock", label: "In Stock" },
-    { value: "lowStock", label: "Low Stock" },
+    { value: "inStock", label: t("inStock") },
+    { value: "lowStock", label: t("lowStock") },
   ];
   const sortOptions = [
-    { value: "priceLowToHigh", label: "Price: Low to High" },
-    { value: "priceHighToLow", label: "Price: High to Low" },
-    { value: "nameAZ", label: "Name: A – Z" },
+    { value: "priceLowToHigh", label: t("priceLowToHigh") },
+    { value: "priceHighToLow", label: t("priceHighToLow") },
+    { value: "nameAZ", label: t("nameAZ") },
   ];
 
   return (
@@ -55,7 +57,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-slate-50">
             <div className="flex items-center space-x-2">
               <SlidersHorizontal className="w-4 h-4 text-slate-600" />
-              <span className="text-sm font-bold text-slate-900">Filters</span>
+              <span className="text-sm font-bold text-slate-900">{t("filters")}</span>
               {activeCount > 0 && (
                 <span className="text-xs font-bold bg-emerald-600 text-white w-5 h-5 rounded-full flex items-center justify-center">
                   {activeCount}
@@ -64,7 +66,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
             </div>
             {activeCount > 0 && (
               <button onClick={clearAll} className="text-xs text-red-500 font-semibold hover:text-red-700 transition-colors">
-                Clear all
+                {t("clearAll")}
               </button>
             )}
           </div>
@@ -75,7 +77,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
               onClick={() => toggleSection("priceRange")}
               className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
             >
-              <span>Price Range</span>
+              <span>{t("priceRange")}</span>
               {openSections.priceRange ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
             </button>
             {openSections.priceRange && (
@@ -104,7 +106,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
               onClick={() => toggleSection("availability")}
               className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
             >
-              <span>Availability</span>
+              <span>{t("availability")}</span>
               {openSections.availability ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
             </button>
             {openSections.availability && (
@@ -132,7 +134,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
               onClick={() => toggleSection("sortBy")}
               className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
             >
-              <span>Sort By</span>
+              <span>{t("sortBy")}</span>
               {openSections.sortBy ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
             </button>
             {openSections.sortBy && (
@@ -166,7 +168,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors" />
           <input
             type="text"
-            placeholder="Search vaccines by name..."
+            placeholder={t("searchPlaceholder")}
             value={searchTerm}
             onChange={handleSearch}
             className="w-full pl-12 pr-12 py-3.5 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white text-sm shadow-sm transition-all"
@@ -181,7 +183,7 @@ const SearchFilter = ({ onSearch, onFilter, children }) => {
         {/* Active Filter Pills */}
         {activeCount > 0 && (
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-slate-400 font-medium">Active filters:</span>
+            <span className="text-xs text-slate-400 font-medium">{t("activeFilters")}</span>
             {activeFilters.priceRange && (
               <span className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full">
                 {priceOptions.find(o => o.value === activeFilters.priceRange)?.label}
