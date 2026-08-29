@@ -231,10 +231,10 @@ const HomePage = () => {
                   <div className="w-48 bg-emerald-700 text-white p-3 flex flex-col justify-between flex-shrink-0">
                     <div>
                       <div className="flex items-center space-x-2 mb-4 px-1">
-                        <div className="w-6 h-6 bg-white/20 rounded-md flex items-center justify-center">
-                          <Syringe className="w-3.5 h-3.5 text-white" />
+                        <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center p-0.5 overflow-hidden shadow-sm">
+                          <img src="/logo.png" alt="Bhalla Distributors Logo" className="w-full h-full object-contain" />
                         </div>
-                        <span className="font-extrabold text-white text-xs tracking-tight">Vaccine Pulse</span>
+                        <span className="font-extrabold text-white text-xs tracking-tight">Bhalla Vaccine</span>
                       </div>
 
                       {/* Mini CTA */}
@@ -268,7 +268,7 @@ const HomePage = () => {
                       <div className="w-6 h-6 bg-emerald-600 rounded-lg text-white font-bold flex items-center justify-center text-[10px]">C</div>
                       <div className="flex-1 truncate">
                         <p className="font-bold text-white text-[11px] truncate">chiragbhalla</p>
-                        <p className="text-[9px] text-emerald-200">Resident</p>
+                        <p className="text-[9px] text-emerald-200 font-semibold">System Admin & Owner</p>
                       </div>
                     </div>
                   </div>
