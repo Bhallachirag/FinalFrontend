@@ -81,6 +81,23 @@ class BookingService {
       throw error;
     }
   }
+
+  async verifyPayment(paymentData) {
+    try {
+      const response = await fetch(`${this.baseURL}/api/v1/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paymentData)
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Verify payment error:', error);
+      throw error;
+    }
+  }
 }
 
 export default new BookingService();    

@@ -40,6 +40,24 @@ export default function MyOrders() {
         }
 
         if (!userId) throw new Error("No user ID found. Please re-login.");
+
+        // Check if returning from Razorpay Payment redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get("razorpay_payment_id");
+        const referenceId = urlParams.get("razorpay_payment_link_reference_id");
+
+        if (paymentId && referenceId) {
+          try {
+            await bookingService.verifyPayment({
+              payment_id: paymentId,
+              reference_id: referenceId
+            });
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (verifyErr) {
+            console.error("Payment verification error:", verifyErr.message);
+          }
+        }
+
         const rawOrders = await bookingService.fetchUserBookings(userId, token);
         const list = filterDuplicateOrders(rawOrders);
         setOrders(list);
