@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { X, Mail, Lock, Phone, Eye, EyeOff, Syringe, ArrowRight } from "lucide-react";
+import { X, Mail, Lock, Phone, Eye, EyeOff, Syringe, ArrowRight, Shield, User } from "lucide-react";
 import { AuthContext } from '../../stores/authStore.js';
 import { ADMIN_EMAIL } from '../../utils/constants.js';
 
@@ -187,6 +187,50 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
               </>
             )}
           </button>
+
+          {/* Quick Recruiter / Demo Logins */}
+          {isLogin && (
+            <div className="pt-3 border-t border-gray-100">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider text-center mb-2">
+                ⚡ Recruiter 1-Click Demo Login
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setFormData({ email: "demo.admin@vaxflow.com", password: "demo", mobileNumber: "" });
+                    setLoading(true);
+                    setError("");
+                    await authContext.login("demo.admin@vaxflow.com", "demo");
+                    onClose();
+                    if (onLoginSuccess) onLoginSuccess();
+                    setTimeout(() => { window.location.href = "/admin"; }, 150);
+                  }}
+                  className="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold rounded-xl flex items-center justify-center space-x-1.5 transition-all shadow-sm active:scale-95"
+                  title="Log in as Demo Admin (Read Only Mode)"
+                >
+                  <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Demo Admin</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setFormData({ email: "checkin@gmail.com", password: "check", mobileNumber: "" });
+                    setLoading(true);
+                    setError("");
+                    await authContext.login("checkin@gmail.com", "check");
+                    onClose();
+                    if (onLoginSuccess) onLoginSuccess();
+                  }}
+                  className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-[11px] font-bold rounded-xl flex items-center justify-center space-x-1.5 transition-all active:scale-95"
+                  title="Log in as Demo User"
+                >
+                  <User className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Demo User</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Toggle */}
           <div className="text-center pt-2">

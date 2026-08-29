@@ -275,7 +275,14 @@ export default function AdminPage() {
     } catch (err) { showToast(err.message, "error"); } finally { setVaccinesLoading(false); }
   };
 
+  const isDemoAdmin = user?.email === 'demo.admin@vaxflow.com' || user?.isDemoAdmin;
+
   const handleAddVaccine = async (data) => {
+    if (isDemoAdmin) {
+      setShowAddModal(false);
+      showToast("🔒 Demo Admin Mode: Data creation is disabled to protect live records.", "error");
+      return;
+    }
     setAddLoading(true);
     try {
       const added = await vaccineService.addVaccine(data, token);
@@ -287,6 +294,11 @@ export default function AdminPage() {
   };
 
   const handleEditSave = async (vaccine, form, inventory) => {
+    if (isDemoAdmin) {
+      setEditModal({ open: false, vaccine: null });
+      showToast("🔒 Demo Admin Mode: Editing is disabled to protect live records.", "error");
+      return;
+    }
     setEditLoading(true);
     try {
       if (form.name !== vaccine.name) await vaccineService.updateVaccine(vaccine.id, { name: form.name }, token);
@@ -300,6 +312,10 @@ export default function AdminPage() {
   };
 
   const handleDeleteVaccine = (v) => {
+    if (isDemoAdmin) {
+      showToast("🔒 Demo Admin Mode: Delete action is disabled to protect live records.", "error");
+      return;
+    }
     setConfirmDialog({
       open: true,
       title: "Delete Vaccine",
@@ -317,7 +333,7 @@ export default function AdminPage() {
 
   if (authLoading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><div className="w-10 h-10 border-4 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin" /></div>;
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const isAdmin = user?.email === ADMIN_EMAIL || user?.email === 'chiragbhalla03@gmail.com' || user?.email === 'demo.admin@vaxflow.com' || user?.isDemoAdmin;
   if (!user || !isAdmin) return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
       <div className="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full text-center border border-gray-100">

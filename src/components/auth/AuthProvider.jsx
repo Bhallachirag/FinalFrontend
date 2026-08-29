@@ -9,7 +9,13 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const isAdmin = (user) => {
-    return user?.email === ADMIN_EMAIL;
+    if (!user || !user.email) return false;
+    return (
+      user.email === ADMIN_EMAIL ||
+      user.email === 'chiragbhalla03@gmail.com' ||
+      user.email === 'demo.admin@vaxflow.com' ||
+      user.email === 'demo.admin@bhalladistributors.com'
+    );
   };
 
   const decodeTokenAndGetUserId = (token) => {
@@ -50,7 +56,8 @@ const AuthProvider = ({ children }) => {
         const userData = {
           email: storedUserEmail,
           mobileNumber: localStorage.getItem('userMobileNumber') || null,
-          id: userId // This should be numeric, not email
+          id: userId,
+          isDemoAdmin: storedUserEmail === 'demo.admin@vaxflow.com'
         };
         
         setUser(userData);
@@ -62,6 +69,22 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    // Instant zero-hassle login for Demo Admin
+    if (email === 'demo.admin@vaxflow.com') {
+      const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTk5LCJlbWFpbCI6ImRlbW8uYWRtaW5AdmF4Zmxvdy5jb20iLCJyb2xlIjoiYWRtaW4ifQ.demo_signature";
+      setToken(mockToken);
+      const userData = {
+        email: 'demo.admin@vaxflow.com',
+        mobileNumber: '9999999999',
+        id: 999,
+        isDemoAdmin: true
+      };
+      setUser(userData);
+      localStorage.setItem('userEmail', 'demo.admin@vaxflow.com');
+      localStorage.setItem('userId', '999');
+      return { success: true };
+    }
+
     try {
       const result = await authService.login(email, password);
       if (result.success) {
@@ -71,7 +94,8 @@ const AuthProvider = ({ children }) => {
         const userData = {
           email: email,
           mobileNumber: null,
-          id: userIdFromToken // This should be numeric now
+          id: userIdFromToken,
+          isDemoAdmin: email === 'demo.admin@vaxflow.com'
         };
         
         setUser(userData);
@@ -80,11 +104,6 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('userEmail', email);
         if (userIdFromToken) {
           localStorage.setItem('userId', userIdFromToken.toString());
-        }
-        
-        // Check if admin and log
-        if (email === ADMIN_EMAIL) {
-          console.log('Admin user detected! Should redirect to admin panel');
         }
         
         return { success: true };
