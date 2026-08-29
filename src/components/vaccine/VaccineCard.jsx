@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, ShoppingBag, Star, Check, ShieldCheck, Sparkles, Package, Shield } from "lucide-react";
+import { Heart, ShoppingBag, Star, Check, ShieldCheck, Sparkles, Package, Shield, Minus, Plus } from "lucide-react";
 
 // Theme styling for the pharmaceutical vaccine box packaging
 const getVaccineBoxTheme = (name = "") => {
@@ -70,9 +70,12 @@ const getVaccineBoxTheme = (name = "") => {
   };
 };
 
-const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
+const VaccineCard = ({ vaccine, inventory, onAddToCart, onUpdateCartQuantity, cartItems = [] }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [added, setAdded] = useState(false);
+
+  const cartItem = cartItems.find(i => i.vaccineId === vaccine.id && i.inventoryId === inventory.id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
 
   const discountPercentage = vaccine.mrp > inventory.price
     ? Math.round(((vaccine.mrp - inventory.price) / vaccine.mrp) * 100)
@@ -174,31 +177,57 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
 
       </div>
 
-      {/* Add to Cart Button */}
+      {/* Add to Cart / Quantity Control Button */}
       <div className="p-3.5 pt-0 bg-white">
-        <button
-          onClick={handleAddToCart}
-          disabled={inventory.quantity === 0}
-          className={`w-full py-3 rounded-2xl font-extrabold text-xs flex items-center justify-center space-x-2 transition-all shadow-md ${
-            inventory.quantity === 0
-              ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
-              : added
-              ? "bg-emerald-800 text-white shadow-emerald-900/20"
-              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98]"
-          }`}
-        >
-          {added ? (
-            <>
-              <Check className="w-4 h-4 text-white" />
-              <span>Added to Booking Cart!</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="w-4 h-4" />
-              <span>{inventory.quantity === 0 ? "Out of Stock" : "Add to Cart"}</span>
-            </>
-          )}
-        </button>
+        {quantityInCart > 0 ? (
+          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200/80 rounded-2xl p-1.5 shadow-sm">
+            <button
+              onClick={() => onUpdateCartQuantity && onUpdateCartQuantity(cartItem, cartItem.quantity - 1)}
+              className="w-9 h-9 rounded-xl bg-white border border-emerald-200 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center transition-all shadow-sm active:scale-95"
+              title="Decrease quantity"
+            >
+              <Minus className="w-4 h-4 text-emerald-700" />
+            </button>
+
+            <div className="flex flex-col items-center px-2">
+              <span className="text-sm font-black text-emerald-950">{quantityInCart}</span>
+              <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-tighter">In Cart</span>
+            </div>
+
+            <button
+              onClick={() => onUpdateCartQuantity && onUpdateCartQuantity(cartItem, cartItem.quantity + 1)}
+              disabled={quantityInCart >= inventory.quantity}
+              className="w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black flex items-center justify-center transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Increase quantity"
+            >
+              <Plus className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            disabled={inventory.quantity === 0}
+            className={`w-full py-3 rounded-2xl font-extrabold text-xs flex items-center justify-center space-x-2 transition-all shadow-md ${
+              inventory.quantity === 0
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
+                : added
+                ? "bg-emerald-800 text-white shadow-emerald-900/20"
+                : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98]"
+            }`}
+          >
+            {added ? (
+              <>
+                <Check className="w-4 h-4 text-white" />
+                <span>Added to Booking Cart!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-4 h-4" />
+                <span>{inventory.quantity === 0 ? "Out of Stock" : "Add to Cart"}</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
     </div>

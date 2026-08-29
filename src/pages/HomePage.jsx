@@ -608,6 +608,8 @@ const HomePage = () => {
                     vaccine={vaccine}
                     inventory={vaccine.inventory}
                     onAddToCart={handleAddToCart}
+                    onUpdateCartQuantity={handleUpdateCartQuantity}
+                    cartItems={cartItems}
                   />
                 ))}
               </div>
