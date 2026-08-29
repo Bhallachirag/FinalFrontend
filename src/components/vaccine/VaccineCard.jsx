@@ -1,69 +1,72 @@
 import React, { useState } from "react";
-import {
-  Heart, Syringe, ShoppingBag, Star, Check, Sparkles,
-  Droplet, Dna, Zap, HeartPulse, ShieldCheck, Thermometer, Activity, Shield
-} from "lucide-react";
+import { Heart, ShoppingBag, Star, Check, ShieldCheck, Sparkles, Package, Shield } from "lucide-react";
 
-// Helper to determine specific category icon & gradient theme for each vaccine
-const getVaccineTheme = (name = "") => {
+// Theme styling for the pharmaceutical vaccine box packaging
+const getVaccineBoxTheme = (name = "") => {
   const lower = name.toLowerCase();
   if (lower.includes("fluarix") || lower.includes("influvac") || lower.includes("fluquadri") || lower.includes("vaxiflu")) {
     return {
-      Icon: Droplet,
-      gradient: "from-[#0f172a] via-[#1e1b4b] to-[#0f172a]",
-      accent: "text-cyan-400",
-      circleBg: "bg-cyan-500/20 border-cyan-400/30",
-      tag: "INFLUENZA CARE",
-      glow: "shadow-cyan-500/20"
+      gradient: "from-sky-600 via-sky-700 to-indigo-800",
+      badgeBg: "bg-sky-100 text-sky-800 border-sky-200",
+      accentText: "text-sky-700",
+      border: "border-sky-200",
+      category: "INFLUENZA VACCINE IP",
+      specs: "0.5ml Pre-filled Syringe",
+      brandTag: "GSK / ABBOTT"
     };
   }
   if (lower.includes("gardasil") || lower.includes("cervavac")) {
     return {
-      Icon: Dna,
-      gradient: "from-[#0f172a] via-[#2e1065] to-[#0f172a]",
-      accent: "text-fuchsia-400",
-      circleBg: "bg-fuchsia-500/20 border-fuchsia-400/30",
-      tag: "HPV & CANCER PREVENTIVE",
-      glow: "shadow-fuchsia-500/20"
+      gradient: "from-purple-600 via-purple-700 to-fuchsia-800",
+      badgeBg: "bg-purple-100 text-purple-800 border-purple-200",
+      accentText: "text-purple-700",
+      border: "border-purple-200",
+      category: "HPV VACCINE (RECOMBINANT)",
+      specs: "0.5ml Single Dose Vial",
+      brandTag: "MSD / SERUM INST"
     };
   }
   if (lower.includes("shingrix")) {
     return {
-      Icon: Zap,
-      gradient: "from-[#0f172a] via-[#451a03] to-[#0f172a]",
-      accent: "text-amber-400",
-      circleBg: "bg-amber-500/20 border-amber-400/30",
-      tag: "SHINGLES IMMUNIZATION",
-      glow: "shadow-amber-500/20"
+      gradient: "from-amber-600 via-amber-700 to-orange-800",
+      badgeBg: "bg-amber-100 text-amber-800 border-amber-200",
+      accentText: "text-amber-700",
+      border: "border-amber-200",
+      category: "HERPES ZOSTER VACCINE",
+      specs: "2-Vial Antigen + Adjuvant",
+      brandTag: "GLAXOSMITHKLINE"
     };
   }
   if (lower.includes("prevenar") || lower.includes("pneumovax")) {
     return {
-      Icon: HeartPulse,
-      gradient: "from-[#0f172a] via-[#064e3b] to-[#0f172a]",
-      accent: "text-emerald-400",
-      circleBg: "bg-emerald-500/20 border-emerald-400/30",
-      tag: "PNEUMOCOCCAL PROTECTION",
-      glow: "shadow-emerald-500/20"
+      gradient: "from-emerald-600 via-emerald-700 to-teal-800",
+      badgeBg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      accentText: "text-emerald-700",
+      border: "border-emerald-200",
+      category: "PNEUMOCOCCAL VACCINE",
+      specs: "0.5ml Suspension Syringe",
+      brandTag: "PFIZER / MSD"
     };
   }
   if (lower.includes("cv-19") || lower.includes("covid")) {
     return {
-      Icon: ShieldCheck,
-      gradient: "from-[#0f172a] via-[#4c0519] to-[#0f172a]",
-      accent: "text-rose-400",
-      circleBg: "bg-rose-500/20 border-rose-400/30",
-      tag: "COVID-19 IMMUNITY",
-      glow: "shadow-rose-500/20"
+      gradient: "from-rose-600 via-rose-700 to-red-800",
+      badgeBg: "bg-rose-100 text-rose-800 border-rose-200",
+      accentText: "text-rose-700",
+      border: "border-rose-200",
+      category: "COVID-19 IMMUNIZATION",
+      specs: "Single Dose Injection",
+      brandTag: "BIOLOGICAL E"
     };
   }
   return {
-    Icon: Syringe,
-    gradient: "from-[#0f172a] via-[#064e3b] to-[#0f172a]",
-    accent: "text-emerald-400",
-    circleBg: "bg-emerald-500/20 border-emerald-400/30",
-    tag: "SPECIALIZED VACCINE",
-    glow: "shadow-emerald-500/20"
+    gradient: "from-teal-600 via-teal-700 to-emerald-800",
+    badgeBg: "bg-teal-100 text-teal-800 border-teal-200",
+    accentText: "text-teal-700",
+    border: "border-teal-200",
+    category: "SPECIALIZED VACCINE IP",
+    specs: "0.5ml Pre-filled Syringe",
+    brandTag: "HEALTHCARE IP"
   };
 };
 
@@ -81,8 +84,7 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const theme = getVaccineTheme(vaccine.name);
-  const { Icon } = theme;
+  const theme = getVaccineBoxTheme(vaccine.name);
 
   const stockStatus = inventory.quantity > 10
     ? { label: "In Stock", color: "text-emerald-700", bg: "bg-emerald-50", dot: "bg-emerald-500" }
@@ -91,66 +93,80 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
     : { label: "Out of Stock", color: "text-red-700", bg: "bg-red-50", dot: "bg-red-500" };
 
   return (
-    <div className="relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 flex flex-col justify-between">
+    <div className="relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200/80 flex flex-col justify-between">
 
-      {/* LitLens Style Premium Header Banner */}
-      <div>
-        <div className={`relative bg-gradient-to-b ${theme.gradient} text-white p-6 flex flex-col items-center justify-between min-h-[220px] select-none overflow-hidden`}>
+      {/* Discount Badge */}
+      {discountPercentage > 0 && (
+        <div className="absolute top-4 left-4 bg-emerald-600 text-white px-2.5 py-0.5 rounded-full text-[9px] font-black z-20 shadow-md">
+          {discountPercentage}% OFF
+        </div>
+      )}
+
+      {/* Wishlist Button */}
+      <button
+        onClick={() => setIsWishlisted(!isWishlisted)}
+        className="absolute top-4 right-4 p-1.5 bg-slate-100/80 backdrop-blur-md rounded-full hover:bg-slate-200 transition-all z-20"
+      >
+        <Heart className={`w-3.5 h-3.5 ${isWishlisted ? "text-rose-500 fill-current scale-110" : "text-slate-400"}`} />
+      </button>
+
+      {/* Clean White Outer Area around the Inner Vaccine Box */}
+      <div className="p-3.5 bg-white">
+        
+        {/* Realistic Vaccine Medicine Packaging Box (Dabba Look) */}
+        <div className={`relative bg-gradient-to-b from-slate-50 via-white to-slate-50 rounded-2xl border-2 ${theme.border} shadow-md group-hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col justify-between h-48 select-none`}>
           
-          {/* Top Bar: Category Tag & Sparkle Icon */}
-          <div className="w-full flex items-center justify-between text-[10px] font-black tracking-widest text-slate-300 uppercase z-10">
-            <span>{theme.tag}</span>
-            <Sparkles className={`w-3.5 h-3.5 ${theme.accent}`} />
+          {/* Top Box Pharma Header Stripe */}
+          <div className={`bg-gradient-to-r ${theme.gradient} text-white px-3.5 py-2 flex items-center justify-between shadow-sm`}>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-[9px] font-black tracking-widest uppercase">{theme.category}</span>
+            </div>
+            <span className="text-[8px] font-mono font-bold opacity-90 px-1.5 py-0.5 bg-white/20 rounded">Rx</span>
           </div>
 
-          {/* Discount Badge */}
-          {discountPercentage > 0 && (
-            <div className="absolute top-3 left-3 bg-emerald-500 text-white px-2.5 py-0.5 rounded-full text-[9px] font-extrabold z-10 shadow-md">
-              {discountPercentage}% OFF
+          {/* Center Box Content - Vaccine Name on top of Medicine Box */}
+          <div className="flex-1 flex flex-col items-center justify-center p-3 text-center space-y-2">
+            
+            {/* Medicine Box Sub-tag */}
+            <div className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-md border text-[9px] font-black tracking-wide ${theme.badgeBg}`}>
+              <ShieldCheck className="w-2.5 h-2.5" />
+              <span>COLD CHAIN 2°C - 8°C</span>
             </div>
-          )}
 
-          {/* Wishlist Button */}
-          <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
-            className="absolute top-3 right-3 p-1.5 bg-slate-800/60 backdrop-blur-md rounded-full hover:bg-slate-800 transition-all z-20"
-          >
-            <Heart className={`w-3.5 h-3.5 ${isWishlisted ? "text-rose-500 fill-current scale-110" : "text-slate-300"}`} />
-          </button>
-
-          {/* Center Circular Glass Icon Container */}
-          <div className="my-4 relative flex items-center justify-center">
-            <div className={`w-16 h-16 rounded-full ${theme.circleBg} border backdrop-blur-md flex items-center justify-center shadow-lg ${theme.glow} group-hover:scale-110 transition-transform duration-300`}>
-              <Icon className={`w-8 h-8 ${theme.accent}`} />
-            </div>
-          </div>
-
-          {/* Vaccine Name right below Icon */}
-          <div className="w-full text-center z-10 px-2">
-            <h3 className="text-sm font-black text-white leading-tight tracking-tight line-clamp-2 min-h-[2.5rem] flex items-center justify-center">
+            {/* Vaccine Name printed on top of the packaging box */}
+            <h3 className="text-base font-black text-slate-900 leading-snug tracking-tight px-1 line-clamp-2">
               {vaccine.name}
             </h3>
+
+            {/* Dose / Spec Details */}
+            <p className="text-[10px] font-semibold text-slate-400">
+              {theme.specs}
+            </p>
+
           </div>
 
-          {/* LitLens Style Divider Line */}
-          <div className="w-full border-t border-slate-700/60 my-2" />
-
-          {/* Subtitle Details below divider line */}
-          <div className="w-full flex items-center justify-between text-[10px] font-medium text-slate-400">
-            <span>Batch: {inventory.batchNumber || 'BTH001'}</span>
-            <span className={theme.accent}>Verified</span>
+          {/* Bottom Box Footer Stripe (Batch & Authenticity) */}
+          <div className="bg-slate-100/90 border-t border-slate-200/80 px-3 py-1.5 flex items-center justify-between text-[9px] font-mono text-slate-500">
+            <span className="font-bold">BATCH: {inventory.batchNumber || 'BTH001'}</span>
+            <span className={`font-black uppercase ${theme.accentText}`}>VERIFIED VACCINE</span>
           </div>
 
         </div>
 
-        {/* Details Content Area */}
-        <div className="p-5 space-y-3 bg-white">
+        {/* Content & Pricing Details below the Box */}
+        <div className="mt-4 px-1 space-y-3">
           
-          <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3 h-3 text-amber-400 fill-current" />
-            ))}
-            <span className="text-[10px] font-bold text-slate-400 ml-1">(4.9)</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 text-amber-400 fill-current" />
+              ))}
+              <span className="text-[10px] font-bold text-slate-400 ml-1">(4.9)</span>
+            </div>
+            <div className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${stockStatus.bg} ${stockStatus.color}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${stockStatus.dot}`} />
+              <span>{stockStatus.label}</span>
+            </div>
           </div>
 
           <div className="flex items-baseline space-x-2">
@@ -164,16 +180,12 @@ const VaccineCard = ({ vaccine, inventory, onAddToCart }) => {
             )}
           </div>
 
-          <div className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${stockStatus.bg} ${stockStatus.color}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${stockStatus.dot}`} />
-            <span>{stockStatus.label} ({inventory.quantity} doses)</span>
-          </div>
-
         </div>
+
       </div>
 
-      {/* Action Button */}
-      <div className="p-5 pt-0 bg-white">
+      {/* Add to Cart Button */}
+      <div className="p-3.5 pt-0 bg-white">
         <button
           onClick={handleAddToCart}
           disabled={inventory.quantity === 0}
